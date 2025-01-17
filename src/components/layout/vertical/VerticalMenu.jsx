@@ -1,6 +1,8 @@
 import { useState } from 'react'
+
 import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
+
 import { Menu, MenuItem } from '@menu/vertical-menu'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
@@ -8,8 +10,6 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 // Importing react-dnd hooks
-import { useDrag, useDrop } from 'react-dnd'
-
 const RenderExpandIcon = ({ open, transitionDuration }) => (
   <StyledVerticalNavExpandIcon open={open} transitionDuration={transitionDuration}>
     <i className='ri-arrow-right-s-line' />
@@ -41,6 +41,7 @@ const VerticalMenu = ({ scrollMenu }) => {
 
   const handleDelete = item => {
     console.log(`Delete ${item}`)
+
     // Add your delete logic here
   }
 
@@ -104,12 +105,14 @@ const VerticalMenu = ({ scrollMenu }) => {
           }}
           onMouseEnter={e => {
             const trashIcon = e.target.querySelector('.ri-delete-bin-line')
+
             if (trashIcon) {
               trashIcon.style.opacity = 1
             }
           }}
           onMouseLeave={e => {
             const trashIcon = e.target.querySelector('.ri-delete-bin-line')
+
             if (trashIcon) {
               trashIcon.style.opacity = 0
             }
@@ -142,12 +145,14 @@ const VerticalMenu = ({ scrollMenu }) => {
           }}
           onMouseEnter={e => {
             const trashIcon = e.target.querySelector('.ri-delete-bin-line')
+
             if (trashIcon) {
               trashIcon.style.opacity = 1
             }
           }}
           onMouseLeave={e => {
             const trashIcon = e.target.querySelector('.ri-delete-bin-line')
+
             if (trashIcon) {
               trashIcon.style.opacity = 0
             }
