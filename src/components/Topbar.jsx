@@ -83,7 +83,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
 
   return (
     <div
-      className={`w-full p-1 bg-gray-100 flex justify-between items-center relative ${settings.mode === 'dark' ? 'bg-[#30324f] text-white' : 'bg-gray-100 text-black'}`}
+      className={`w-full p-1  flex justify-between items-center relative ${settings.mode === 'dark' ? 'bg-[#282A42] text-white' : 'bg-gray-100 text-black'}`}
     >
       {/* Left Side: Popular and Chat */}
       <div className='w-full lg:w-1/3 flex justify-center items-center space-x-1'>

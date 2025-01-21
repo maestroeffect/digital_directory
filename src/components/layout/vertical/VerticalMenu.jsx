@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+import { useRouter } from 'next/navigation' // Updated import for Next.js app directory
 
 import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import axios from 'axios'
 
 import { Menu, MenuItem } from '@menu/vertical-menu'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -9,7 +12,6 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
-// Importing react-dnd hooks
 const RenderExpandIcon = ({ open, transitionDuration }) => (
   <StyledVerticalNavExpandIcon open={open} transitionDuration={transitionDuration}>
     <i className='ri-arrow-right-s-line' />
@@ -22,27 +24,41 @@ const VerticalMenu = ({ scrollMenu }) => {
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
-  // // Drag-and-drop state
-  // const [draggedItem, setDraggedItem] = useState(null)
+  const [feedSources, setFeedSources] = useState([])
+  const router = useRouter()
 
-  // // Handle dragging and dropping
-  // const [, drop] = useDrop({
-  //   accept: 'menuItem',
-  //   drop: item => {
-  //     setDraggedItem(item)
-  //     // Handle rearranging logic here
-  //   }
-  // })
+  // Fetch JSON feed
+  useEffect(() => {
+    const fetchFeedSources = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/v1/feed') // Fetch JSON feed
+        const feedItems = response.data.items || []
 
-  // const [, drag] = useDrag({
-  //   type: 'menuItem',
-  //   item: { id: 'menuItem1' } // Unique identifier for each item
-  // })
+        // Extract unique feeds based on title and generate URLs
+        const feedsMap = new Map()
 
-  const handleDelete = item => {
-    console.log(`Delete ${item}`)
+        feedItems.forEach(item => {
+          const title = item.source || 'Unknown Source'
+          const slug = title.toLowerCase().replace(/\s+/g, '-') // URL-safe slug
 
-    // Add your delete logic here
+          if (!feedsMap.has(title)) {
+            feedsMap.set(title, { name: title, slug })
+          }
+        })
+
+        const feeds = Array.from(feedsMap.values())
+
+        setFeedSources(feeds)
+      } catch (error) {
+        console.error('Error fetching feed sources:', error)
+      }
+    }
+
+    fetchFeedSources()
+  }, [])
+
+  const handleMenuClick = slug => {
+    router.push(`/${slug}`) // Navigate to the dynamic source page
   }
 
   return (
@@ -61,120 +77,19 @@ const VerticalMenu = ({ scrollMenu }) => {
         popoutMenuOffset={{ mainAxis: 17 }}
         menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-        renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-fill' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        {/* <MenuItem href='/home' icon={<i className='ri-home-smile-line' />} style={{ position: 'relative' }}>
-          Home
-          <span
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              opacity: 0,
-              transition: 'opacity 0.3s'
-            }}
-            className='ri-delete-bin-line'
-            onClick={() => console.log('Delete Home')}
-          />
-        </MenuItem>
-
-        <MenuItem href='/about' icon={<i className='ri-information-line' />} style={{ position: 'relative' }}>
-          About
-          <span
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              opacity: 0,
-              transition: 'opacity 0.3s'
-            }}
-            className='ri-delete-bin-line'
-            onClick={() => console.log('Delete About')}
-          />
-        </MenuItem> */}
-
-        <MenuItem
-          href='/home'
-          icon={<i className='ri-home-smile-line' />}
-          style={{
-            position: 'relative',
-            cursor: 'pointer'
-          }}
-          onMouseEnter={e => {
-            const trashIcon = e.target.querySelector('.ri-delete-bin-line')
-
-            if (trashIcon) {
-              trashIcon.style.opacity = 1
-            }
-          }}
-          onMouseLeave={e => {
-            const trashIcon = e.target.querySelector('.ri-delete-bin-line')
-
-            if (trashIcon) {
-              trashIcon.style.opacity = 0
-            }
-          }}
-        >
-          Home
-          <span
-            className='ri-delete-bin-line'
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              opacity: 0,
-              transition: 'opacity 0.3s'
-            }}
-            onClick={e => {
-              e.stopPropagation() // Prevent click from propagating to the MenuItem
-              handleDelete('Home')
-            }}
-          />
-        </MenuItem>
-
-        <MenuItem
-          href='/about'
-          icon={<i className='ri-information-line' />}
-          style={{
-            position: 'relative',
-            cursor: 'pointer'
-          }}
-          onMouseEnter={e => {
-            const trashIcon = e.target.querySelector('.ri-delete-bin-line')
-
-            if (trashIcon) {
-              trashIcon.style.opacity = 1
-            }
-          }}
-          onMouseLeave={e => {
-            const trashIcon = e.target.querySelector('.ri-delete-bin-line')
-
-            if (trashIcon) {
-              trashIcon.style.opacity = 0
-            }
-          }}
-        >
-          About
-          <span
-            className='ri-delete-bin-line'
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              opacity: 0,
-              transition: 'opacity 0.3s'
-            }}
-            onClick={e => {
-              e.stopPropagation() // Prevent click from propagating to the MenuItem
-              handleDelete('About')
-            }}
-          />
-        </MenuItem>
+        {feedSources.map((feed, index) => (
+          <MenuItem
+            key={`${feed.name}-${index}`}
+            href={`/${feed.slug}`}
+            icon={<i className='ri-feed-line' />}
+            style={{ position: 'relative', cursor: 'pointer' }}
+            onClick={() => handleMenuClick(feed.slug)}
+          >
+            {feed.name}
+          </MenuItem>
+        ))}
       </Menu>
     </ScrollWrapper>
   )

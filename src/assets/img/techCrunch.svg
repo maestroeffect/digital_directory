@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.4 (67378) - http://www.bohemiancoding.com/sketch -->
+    <title>TechCrunch</title>
+    <desc>Created with Sketch.</desc>
+    <g id="TechCrunch" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#0AB500" x="0" y="0" width="80" height="80"></rect>
+        <path d="M39.4999565,27 L39.4999565,35.6666667 L30.999942,35.6666667 L30.999942,53 L22.4999276,53 L22.4999276,35.6666667 L14,35.6666667 L14,27 L39.4999565,27 Z M47.999971,27 L65,27 L65,35.6666667 L47.999971,35.6666667 L47.999971,27 Z M65,44.3333333 L65,53 L39.4999565,53 L39.4999565,35.6666667 L47.999971,35.6666667 L47.999971,44.3333333 L65,44.3333333 Z" id="Shape" fill="#FFFFFF" fill-rule="nonzero"></path>
+    </g>
+</svg>
