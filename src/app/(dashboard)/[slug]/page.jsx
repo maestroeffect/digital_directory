@@ -24,15 +24,15 @@ const SourcePage = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:5000/v1/feed', {
+      const response = await fetch('https://api.qubicweb.com/v2/feed', {
         next: { revalidate: 10 }
       })
 
       const data = await response.json()
 
       // Log the full data to check its structure
-      console.log('Fetched Data:', data)
-      console.log('Source from params:', source)
+      // console.log('Fetched Data:', data)
+      // console.log('Source from params:', source)
 
       // console.log('Source in data:', item.source?.title)
 

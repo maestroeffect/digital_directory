@@ -31,7 +31,7 @@ const VerticalMenu = ({ scrollMenu }) => {
   useEffect(() => {
     const fetchFeedSources = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/v1/feed') // Fetch JSON feed
+        const response = await axios.get('https://api.qubicweb.com/v2/feed') // Fetch JSON feed
         const feedItems = response.data.items || []
 
         // Extract unique feeds based on title and generate URLs
