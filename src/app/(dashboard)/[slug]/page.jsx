@@ -24,7 +24,7 @@ const SourcePage = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('https://api.qubicweb.com/v2/feed', {
+      const response = await fetch('https://api2.qubicweb.com/v2/feed', {
         next: { revalidate: 10 }
       })
 

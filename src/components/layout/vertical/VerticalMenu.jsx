@@ -31,7 +31,7 @@ const VerticalMenu = ({ scrollMenu }) => {
   useEffect(() => {
     const fetchFeedSources = async () => {
       try {
-        const response = await axios.get('https://api.qubicweb.com/v2/feed') // Fetch JSON feed
+        const response = await axios.get('https://api2.qubicweb.com/v2/feed') // Fetch JSON feed
         const feedItems = response.data.items || []
 
         // Extract unique feeds based on title and generate URLs
@@ -41,8 +41,10 @@ const VerticalMenu = ({ scrollMenu }) => {
           const title = item.source || 'Unknown Source'
           const slug = title.toLowerCase().replace(/\s+/g, '-') // URL-safe slug
 
+          const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico` // Default favicon fallback
+
           if (!feedsMap.has(title)) {
-            feedsMap.set(title, { name: title, slug })
+            feedsMap.set(title, { name: title, slug, favicon })
           }
         })
 
@@ -83,7 +85,7 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem
             key={`${feed.name}-${index}`}
             href={`/${feed.slug}`}
-            icon={<i className='ri-feed-line' />}
+            icon={<img src={feed.favicon} alt={feed.name} width='24' height='24' style={{}} />}
             style={{ position: 'relative', cursor: 'pointer' }}
             onClick={() => handleMenuClick(feed.slug)}
           >
