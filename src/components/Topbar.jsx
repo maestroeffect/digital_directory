@@ -86,7 +86,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
       className={`w-full p-1  flex justify-between items-center relative ${settings.mode === 'dark' ? 'bg-[#282A42] text-white' : 'bg-gray-100 text-black'}`}
     >
       {/* Left Side: Popular and Chat */}
-      <div className='w-full lg:w-1/3 flex justify-center items-center space-x-1'>
+      {/* <div className='w-full lg:w-1/3 flex justify-center items-center space-x-1'>
         <Tooltip title='Showing Popular' arrow placement='left'>
           <div
             className={`flex items-center space-x-1 border px-2 py-1 rounded-md  ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'}`}
@@ -104,12 +104,12 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
             <Chat fontSize='small' className={`${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`} />
           </div>
         </Tooltip>
-      </div>
+      </div> */}
 
       {/* Right Side: Tabs and Icons */}
-      <div className='w-full lg:w-2/3 flex justify-between items-center space-x-6'>
+      <div className='w-full lg:w-3/3 flex justify-end items-center space-x-6'>
         {/* Tabs: Original and Reader */}
-        <div
+        {/* <div
           className={`flex space-x-0 border ml-[35%] p-1 rounded-lg ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'}`}
         >
           <div
@@ -128,7 +128,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
           >
             Reader
           </div>
-        </div>
+        </div> */}
 
         {/* Icons: Font Size, Share, View Original */}
         <div className='flex space-x-2 relative'>

@@ -41,7 +41,7 @@ const NewsList = ({ newsData, onClick, activeId, loading, onScroll }) => {
           >
             {/* ID Badge */}
             <div
-              className='absolute top-4 left-3 bg-orange-500 text-white font-bold text-sm flex items-center justify-center'
+              className='absolute top-4 left-3 bg-black rounded-xl text-white font-bold text-sm flex items-center justify-center'
               style={{ width: '28px', height: '28px' }}
             >
               {news.id}
