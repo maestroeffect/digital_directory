@@ -10,6 +10,10 @@ import Link from 'next/link'
 import { styled, useColorScheme, useTheme } from '@mui/material/styles'
 
 // Component Imports
+import { Button } from '@mui/material'
+
+import { ArrowBack } from '@mui/icons-material'
+
 import VerticalNav, { NavHeader, NavCollapseIcons } from '@menu/vertical-menu'
 import VerticalMenu from './VerticalMenu'
 import Logo from '@components/layout/shared/Logo'
@@ -129,6 +133,25 @@ const Navigation = props => {
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
       <VerticalMenu scrollMenu={scrollMenu} />
+      <a href='https://qubicweb.com' target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none' }}>
+        <Button
+          variant='contained'
+          startIcon={<ArrowBack />}
+          sx={{
+            mt: 2,
+            mb: 2,
+            mx: 'auto',
+            display: 'flex',
+            width: '75%',
+            backgroundColor: '#000',
+            '&:hover': {
+              backgroundColor: '#F15A25'
+            }
+          }}
+        >
+          Back to D.G Brief
+        </Button>
+      </a>
     </VerticalNav>
   )
 }

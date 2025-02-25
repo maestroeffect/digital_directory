@@ -14,13 +14,20 @@ import NavSearch from '@components/layout/shared/search'
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 import LoginButton from '../shared/LoginButton'
 import SignUpButton from '../shared/SignUpButton'
+import FontSizeControl from '../shared/FontSizeControl'
+import ViewOriginal from '../shared/ViewOriginal'
+import ShareButton from '../shared/ShareButton'
 
-const NavbarContent = () => {
+const NavbarContent = ({ fontSize, setFontSize, activeLink }) => {
   return (
     <div className={classnames(verticalLayoutClasses.navbarContent, 'flex items-center justify-between gap-4 is-full')}>
       <div className='flex items-center gap-4'>
         <NavToggle />
         <NavSearch />
+
+        {/* <FontSizeControl fontSize={fontSize} setFontSize={setFontSize} />
+        <ViewOriginal activeLink={activeLink} />
+        <ShareButton activeLink={activeLink} /> */}
       </div>
       <div className='flex items-center gap-3'>
         <LanguageDropdown />
