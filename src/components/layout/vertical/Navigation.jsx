@@ -142,14 +142,18 @@ const Navigation = props => {
             mb: 2,
             mx: 'auto',
             display: 'flex',
-            width: '75%',
+            width: isCollapsed && !isHovered ? '50px' : '75%', // Expands when hovered
+            minWidth: '50px',
+            justifyContent: isCollapsed && !isHovered ? 'center' : 'flex-start', // Aligns text when hovered
             backgroundColor: '#000',
+            color: '#fff',
+            transition: 'width 0.2s ease-in-out',
             '&:hover': {
               backgroundColor: '#F15A25'
             }
           }}
         >
-          Back to D.G Brief
+          {(!isCollapsed || isHovered) && 'Back to D.G Brief'}
         </Button>
       </a>
     </VerticalNav>
