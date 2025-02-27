@@ -48,7 +48,8 @@ const VerticalMenu = ({ scrollMenu }) => {
           }
         })
 
-        const feeds = Array.from(feedsMap.values())
+        // Convert Map to Array and sort alphabetically
+        const feeds = Array.from(feedsMap.values()).sort((a, b) => a.name.localeCompare(b.name))
 
         setFeedSources(feeds)
       } catch (error) {
