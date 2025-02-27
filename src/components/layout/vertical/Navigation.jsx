@@ -107,7 +107,7 @@ const Navigation = props => {
     <VerticalNav
       customStyles={navigationCustomStyles(verticalNavOptions, theme)}
       collapsedWidth={71}
-      backgroundColor='#000'
+      backgroundColor={`${settings.mode == 'dark' ? '#000' : ''}`}
       // eslint-disable-next-line lines-around-comment
       // The following condition adds the data-dark attribute to the VerticalNav component
       // when semiDark is enabled and the mode or systemMode is light

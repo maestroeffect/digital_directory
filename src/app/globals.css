@@ -19,6 +19,9 @@
 }
 
 [data-dark] {
+  body {
+    background-color: #000000;
+  }
   --backdrop-color: rgb(16 17 33 / 0.6);
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-darkShadow);
 }
@@ -134,7 +137,11 @@ code {
 
 body {
   overflow: hidden;
-  background-color: #000;
+}
+
+.dark body {
+  --background-color: #121212; /* Dark mode background */
+  --primary-color: #ffffff; /* Light text for dark mode */
 }
 
 .custom-scrollbar {

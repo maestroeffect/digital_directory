@@ -310,7 +310,7 @@ const colorSchemes = skin => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
-          bodyBg: '#000',
+          bodyBg: '#282A42',
           chatBg: '#343752',
           greyLightBg: '#333851',
           inputBorder: `rgb(var(--mui-mainColorChannels-dark) / 0.22)`,
