@@ -1,12 +1,16 @@
-import qubiclogo from '../../assets/img/logo.png'
+import qubiclogo from '../../assets/img/logo.gif'
+import { useSettings } from '@core/hooks/useSettings'
+import qubicwebgifwhite from '@assets/img/logo_white.gif'
 
 const Logo = props => {
+  const { settings } = useSettings()
+
   return (
     <img
-      src={qubiclogo.src} // Use the `src` property of the imported object
+      src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubiclogo.src} // Use the `src` property of the imported object
       style={{
-        width: '40px',
-        height: '40px',
+        width: '55px',
+        height: '55px',
         objectFit: 'contain',
         flexShrink: 0 // Prevent shrinking in flex containers
       }}

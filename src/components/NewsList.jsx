@@ -11,7 +11,7 @@ import PerfectScrollbarWrapper from './PerfectScrollbar'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 
-import qubicwebgif from '../assets/img/loading.gif'
+import qubicwebgif from '../assets/img/logo.gif'
 
 const NewsList = ({ newsData, onClick, activeId, loading, onScroll }) => {
   // Settings hook

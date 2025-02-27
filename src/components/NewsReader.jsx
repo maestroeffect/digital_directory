@@ -3,7 +3,9 @@ import { Divider } from '@mui/material'
 
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
-import qubicwebgif from '@assets/img/loading.gif'
+import qubicwebgif from '@assets/img/logo.gif'
+
+import qubicwebgifwhite from '@assets/img/logo_white.gif'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -19,7 +21,7 @@ const NewsReader = ({ newsData, activeId, activeTab, fontSize }) => {
   if (!activeNews) {
     return (
       <div className='p-8 flex flex-col items-center'>
-        <img src={qubicwebgif.src} className='w-[30%] h-[30%]' />
+        <img src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src} className='w-[30%] h-[30%]' />
         <p className={`text-center border p-2 ${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'} mt-4`}>
           Select a news item to view its details.
         </p>

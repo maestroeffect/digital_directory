@@ -133,29 +133,7 @@ const Navigation = props => {
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
       <VerticalMenu scrollMenu={scrollMenu} />
-      <a href='https://qubicweb.com' target='_blank' rel='noopener noreferrer' style={{ textDecoration: 'none' }}>
-        <Button
-          variant='contained'
-          startIcon={<ArrowBack />}
-          sx={{
-            mt: 2,
-            mb: 2,
-            mx: 'auto',
-            display: 'flex',
-            width: isCollapsed && !isHovered ? '50px' : '75%', // Expands when hovered
-            minWidth: '50px',
-            justifyContent: isCollapsed && !isHovered ? 'center' : 'flex-start', // Aligns text when hovered
-            backgroundColor: '#000',
-            color: '#fff',
-            transition: 'width 0.2s ease-in-out',
-            '&:hover': {
-              backgroundColor: '#F15A25'
-            }
-          }}
-        >
-          {(!isCollapsed || isHovered) && 'Back to D.G Brief'}
-        </Button>
-      </a>
+      
     </VerticalNav>
   )
 }
