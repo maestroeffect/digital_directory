@@ -5,7 +5,7 @@ const SignUpButton = () => {
 
   return (
     <button
-      className={`px-4 py-2 text-sm font-semibold ${settings.mode === 'dark' ? 'text-white bg-[#282A42]' : 'text-gray-600'} border border-black cursor-pointer transition`}
+      className={`px-4 py-2 text-sm font-semibold ${settings.mode === 'dark' ? 'text-white bg-[#f73]' : 'text-gray-600'} border border-black cursor-pointer transition`}
       onClick={() => {
         // Handle signup logic here
         console.log('SignUp button clicked')

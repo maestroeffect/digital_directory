@@ -83,13 +83,13 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
 
   return (
     <div
-      className={`w-full p-1  flex justify-between items-center relative ${settings.mode === 'dark' ? 'bg-[#282A42] text-white' : 'bg-gray-100 text-black'}`}
+      className={`w-full p-1  flex justify-between items-center relative ${settings.mode === 'dark' ? 'bg-[#000] text-white' : 'bg-gray-100 text-black'}`}
     >
       {/* Left Side: Popular and Chat */}
       {/* <div className='w-full lg:w-1/3 flex justify-center items-center space-x-1'>
         <Tooltip title='Showing Popular' arrow placement='left'>
           <div
-            className={`flex items-center space-x-1 border px-2 py-1 rounded-md  ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'}`}
+            className={`flex items-center space-x-1 border px-2 py-1 rounded-md  ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'}`}
           >
             <Star fontSize='small' className={`${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`} />
             <span className={`text-xs font-semibold ${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`}>
@@ -99,7 +99,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
         </Tooltip>
         <Tooltip title='Report' arrow placement='right'>
           <div
-            className={`flex items-center space-x-1 border px-2 py-1 rounded-md  ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'}`}
+            className={`flex items-center space-x-1 border px-2 py-1 rounded-md  ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'}`}
           >
             <Chat fontSize='small' className={`${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`} />
           </div>
@@ -110,7 +110,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
       <div className='w-full lg:w-3/3 flex justify-end items-center space-x-6'>
         {/* Tabs: Original and Reader */}
         {/* <div
-          className={`flex space-x-0 border ml-[35%] p-1 rounded-lg ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'}`}
+          className={`flex space-x-0 border ml-[35%] p-1 rounded-lg ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'}`}
         >
           <div
             onClick={() => setActiveTab('original')}
@@ -134,7 +134,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
         <div className='flex space-x-2 relative'>
           {/* Font Size Icon with Popup */}
           <div
-            className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} cursor-pointer relative`}
+            className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'} cursor-pointer relative`}
             onMouseEnter={() => {
               setShowFontPopup(true)
               setShowSharePopup(false)
@@ -146,7 +146,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
               className={`${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`}
             />
             <div
-              className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} border shadow-lg rounded-md p-2 text-center w-40 z-10 transition-all duration-300 ease-in-out ${
+              className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'} border shadow-lg rounded-md p-2 text-center w-40 z-10 transition-all duration-300 ease-in-out ${
                 showFontPopup ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
               }`}
             >
@@ -175,7 +175,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
               href={activeLink || '#'}
               target='_blank'
               rel='noopener noreferrer'
-              className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} cursor-pointer`}
+              className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'} cursor-pointer`}
             >
               <OpenInNew
                 fontSize='small'
@@ -185,7 +185,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
           </Tooltip>
           {/* Share Icon with Popup */}
           <div
-            className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} cursor-pointer relative`}
+            className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'} cursor-pointer relative`}
             onMouseEnter={() => {
               setShowSharePopup(true)
               setShowFontPopup(false)
@@ -195,7 +195,7 @@ const TopBar = ({ setActiveTab, activeTab, fontSize, setFontSize, activeLink }) 
             <Share fontSize='small' className={`${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'}`} />
             <div
               ref={sharePopupRef}
-              className={`absolute top-full flex justify-center mt-2 left-1/2 transform -translate-x-1/2 ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} border shadow-lg rounded-md p-2 text-left w-40 z-10 transition-all duration-300 ease-in-out ${
+              className={`absolute top-full flex justify-center mt-2 left-1/2 transform -translate-x-1/2 ${settings.mode === 'dark' ? 'bg-[#000]' : 'bg-white'} border shadow-lg rounded-md p-2 text-left w-40 z-10 transition-all duration-300 ease-in-out ${
                 showSharePopup ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
               }`}
             >
