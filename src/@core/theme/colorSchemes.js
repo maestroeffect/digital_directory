@@ -165,7 +165,7 @@ const colorSchemes = skin => {
         primary: {
           main: '#666CFF',
           light: '#8589FF',
-          dark: '#5C61E6',
+          dark: '#000',
           lighterOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.08)',
           lightOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.16)',
           mainOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',
@@ -310,7 +310,7 @@ const colorSchemes = skin => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
-          bodyBg: '#282A42',
+          bodyBg: '#000',
           chatBg: '#343752',
           greyLightBg: '#333851',
           inputBorder: `rgb(var(--mui-mainColorChannels-dark) / 0.22)`,

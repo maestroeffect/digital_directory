@@ -58,7 +58,7 @@ export default plugin(function () {}, {
         actionSelected: 'var(--mui-palette-action-selected)',
         actionFocus: 'var(--mui-palette-action-focus)',
         backgroundPaper: 'var(--mui-palette-background-paper)',
-        backgroundDefault: 'var(--mui-palette-background-default)',
+        backgroundDefault: '#000',
         track: 'var(--mui-palette-customColors-trackBg)',
         backdrop: 'var(--backdrop-color)',
         facebook: '#4267B2',

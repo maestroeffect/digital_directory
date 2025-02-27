@@ -35,16 +35,24 @@ const SourcePage = () => {
       // console.log('Source from params:', source)
 
       // console.log('Source in data:', item.source?.title)
+      console.log('API Response:', data)
 
       // Filter items by the source title
       const items = data.items
         .filter(item => {
-          const lowercaseSource = item.source.toLowerCase() // Convert the source to lowercase
+          if (!item.source) {
+            console.warn('Missing source for item:', item)
 
-          console.log(`Source in item (lowercase): ${lowercaseSource}`) // Log the lowercase source
+            return false // Skip items with no source
+          }
+
+          const lowercaseSource = item.source.toLowerCase()
+
+          console.log(`Source in item (lowercase): ${lowercaseSource}`)
 
           return lowercaseSource === source.toLowerCase()
         })
+
         .map((item, index) => ({
           id: index,
           title: item.title,

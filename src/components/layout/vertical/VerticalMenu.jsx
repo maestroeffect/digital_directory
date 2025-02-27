@@ -86,8 +86,12 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem
             key={`${feed.name}-${index}`}
             href={`/${feed.slug}`}
-            icon={<img src={feed.favicon} alt={feed.name} width='24' height='24' style={{}} />}
-            style={{ position: 'relative', cursor: 'pointer' }}
+            icon={<img src={feed.favicon} alt={feed.name} width='24' height='24' />}
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+              color: theme.palette.mode === 'dark' ? '#fff' : 'inherit' // White text in dark mode
+            }}
             onClick={() => handleMenuClick(feed.slug)}
           >
             {feed.name}
