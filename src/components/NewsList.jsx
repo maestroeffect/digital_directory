@@ -41,10 +41,14 @@ const NewsList = ({ newsData, onClick, activeId, loading, onScroll }) => {
           >
             {/* ID Badge */}
             <div
-              className='absolute top-4 left-3 bg-black rounded-xl text-white font-bold text-sm flex items-center justify-center'
-              style={{ width: '28px', height: '28px' }}
+              className='absolute top-4 left-3 bg-black text-white font-bold text-sm flex items-center justify-center'
+              style={{
+                width: '32px', // Adjust size as needed
+                height: '28px',
+                clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' // Hexagon shape
+              }}
             >
-              {news.id}
+              {news.id + 1}
             </div>
 
             {/* Content section with enough padding on the left to avoid overlap with the ID badge */}

@@ -14,7 +14,7 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'Qubicweb - Digital Directory',
+  title: 'Digital Directory',
   description: 'Customize your News Feeds'
 }
 
