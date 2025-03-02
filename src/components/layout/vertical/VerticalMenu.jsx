@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import { useRouter } from 'next/navigation' // Updated import for Next.js app directory
+import { useRouter } from 'next/navigation'
 
 import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -27,41 +27,49 @@ const VerticalMenu = ({ scrollMenu }) => {
   const [feedSources, setFeedSources] = useState([])
   const router = useRouter()
 
+  // Function to generate slugs from source names
+  const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
+
   // Fetch JSON feed
   useEffect(() => {
     const fetchFeedSources = async () => {
       try {
-        const response = await axios.get('https://api2.qubicweb.com/v2/feed') // Fetch JSON feed
-        const feedItems = response.data.items || []
+        const response = await axios.get('https://api2.qubicweb.com/v2/feed')
 
-        // Extract unique feeds based on title and generate URLs
+        console.log('API Response:', response.data)
+
+        const feedItems = Array.isArray(response.data.items) ? response.data.items : [] // Ensure array
+
+        console.log('Fetched News Items:', feedItems)
+
         const feedsMap = new Map()
 
         feedItems.forEach(item => {
-          const title = item.source || 'Unknown Source'
-          const slug = title.toLowerCase().replace(/\s+/g, '-') // URL-safe slug
+          if (!item.source) return // Skip if source is missing
 
-          const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico` // Default favicon fallback
+          const title = item.source
+          const slug = generateSlug(title)
+          const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico`
 
           if (!feedsMap.has(title)) {
             feedsMap.set(title, { name: title, slug, favicon })
           }
         })
 
-        // Convert Map to Array and sort alphabetically
         const feeds = Array.from(feedsMap.values()).sort((a, b) => a.name.localeCompare(b.name))
 
         setFeedSources(feeds)
       } catch (error) {
         console.error('Error fetching feed sources:', error)
+        setFeedSources([]) // Ensure state is an array
       }
     }
 
     fetchFeedSources()
   }, [])
 
-  const handleMenuClick = slug => {
-    router.push(`/${slug}`) // Navigate to the dynamic source page
+  const handleMenuClick = (slug, name) => {
+    router.push(`/${slug}?source=${encodeURIComponent(name)}`)
   }
 
   return (
@@ -90,9 +98,9 @@ const VerticalMenu = ({ scrollMenu }) => {
             style={{
               position: 'relative',
               cursor: 'pointer',
-              color: theme.palette.mode === 'dark' ? '#fff' : 'inherit' // White text in dark mode
+              color: theme.palette.mode === 'dark' ? '#fff' : 'inherit'
             }}
-            onClick={() => handleMenuClick(feed.slug)}
+            onClick={() => handleMenuClick(feed.slug, feed.name)}
           >
             {feed.name}
           </MenuItem>
