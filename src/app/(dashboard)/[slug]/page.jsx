@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 
 import { useParams } from 'next/navigation'
 
+import Mercury from '@postlight/mercury-parser'
+
 import FeedLayout from '@/components/layout/vertical/FeedLayout'
 import NewsList from '@/components/NewsList'
 import NewsReader from '@/components/NewsReader'
@@ -27,15 +29,14 @@ const SourcePage = () => {
     return imgTags.map(tag => tag.match(/src="([^">]+)"/)[1])
   }
 
-  // Fetch full content and images using your API
+  // Fetch full content and images using Mercury
   const fetchFullContent = async url => {
     try {
-      const response = await fetch(`https://api2.qubicweb.com/v2/fetch-content?url=${encodeURIComponent(url)}`)
-      const result = await response.json()
+      const result = await Mercury.parse(url)
 
       if (result) {
         const content = result.content || ''
-        const mainImage = result.mainImage || '' // Main Hero Image
+        const mainImage = result.lead_image_url || ''
         const images = extractImages(content)
 
         return { fullContent: content, mainImage, images }
@@ -74,7 +75,7 @@ const SourcePage = () => {
               source: item.source || 'Unknown Source',
               contentSnippet: item.contentSnippet,
               publishedDate: item.publishedDate,
-              image: mainImage || images[0] || item.image || '/default-news.jpg', // Use Main Image, First Extracted Image, or Fallback
+              image: mainImage || item.image || '',
               fullContent: fullContent || item.fullContent || '',
               additionalImages: images
             }

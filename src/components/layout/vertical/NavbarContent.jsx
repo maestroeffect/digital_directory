@@ -33,7 +33,6 @@ const NavbarContent = ({ fontSize, setFontSize, activeLink }) => {
         <LanguageDropdown />
         <ModeDropdown />
         <LoginButton />
-        <SignUpButton />
         <UserDropdown />
       </div>
     </div>
