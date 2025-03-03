@@ -19,13 +19,13 @@ const FeedLayout = ({ children, activeLink }) => {
 
   return (
     <div>
-      <TopBar
+      {/* <TopBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         fontSize={fontSize}
         setFontSize={setFontSize}
         activeLink={activeLink}
-      />
+      /> */}
       <div className='p-1 flex gap-3 flex-col md:flex-row'>
         {/* Left Side */}
         <div className='w-full lg:w-1/3'>
