@@ -17,7 +17,6 @@ import SignUpButton from '../shared/SignUpButton'
 import FontSizeControl from '../shared/FontSizeControl'
 import ViewOriginal from '../shared/ViewOriginal'
 import ShareButton from '../shared/ShareButton'
-import FontIconToggle from '../shared/FontControl'
 import FontControl from '../shared/FontControl'
 
 const NavbarContent = ({ fontSize, setFontSize, activeLink }) => {
