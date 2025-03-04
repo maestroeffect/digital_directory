@@ -17,6 +17,8 @@ import SignUpButton from '../shared/SignUpButton'
 import FontSizeControl from '../shared/FontSizeControl'
 import ViewOriginal from '../shared/ViewOriginal'
 import ShareButton from '../shared/ShareButton'
+import FontIconToggle from '../shared/FontControl'
+import FontControl from '../shared/FontControl'
 
 const NavbarContent = ({ fontSize, setFontSize, activeLink }) => {
   return (
@@ -32,6 +34,9 @@ const NavbarContent = ({ fontSize, setFontSize, activeLink }) => {
       <div className='flex items-center gap-3'>
         <LanguageDropdown />
         <ModeDropdown />
+        <FontControl />
+        <ViewOriginal />
+        <ShareButton />
         <LoginButton />
         <UserDropdown />
       </div>

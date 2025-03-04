@@ -1,23 +1,26 @@
-import { OpenInNew } from '@mui/icons-material'
-import { Tooltip } from '@mui/material'
+'use client'
+
+import { useState } from 'react'
+
+import Tooltip from '@mui/material/Tooltip'
+import IconButton from '@mui/material/IconButton'
 
 import { useSettings } from '@core/hooks/useSettings'
 
-const ViewOriginal = ({ activeLink }) => {
-  const { settings } = useSettings()
+const FontIconToggle = () => {
+  const { settings, updateSettings } = useSettings()
+
+  const toggleMode = () => {
+    updateSettings({ mode: settings.mode === 'dark' ? 'light' : 'dark' })
+  }
 
   return (
-    <Tooltip title='View Original' arrow placement='left'>
-      <a
-        href={activeLink || '#'}
-        target='_blank'
-        rel='noopener noreferrer'
-        className={`flex items-center border px-1 py-1 rounded-md ${settings.mode === 'dark' ? 'bg-[#282A42]' : 'bg-white'} cursor-pointer`}
-      >
-        <OpenInNew fontSize='small' className='text-gray-500' />
-      </a>
+    <Tooltip title={`Open News in new tab`}>
+      <IconButton onClick={toggleMode} className='text-textPrimary'>
+        <i className={settings.mode === 'dark' ? 'ri-external-link-line' : 'ri-external-link-line'} />
+      </IconButton>
     </Tooltip>
   )
 }
 
-export default ViewOriginal
+export default FontIconToggle
