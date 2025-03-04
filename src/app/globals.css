@@ -139,11 +139,6 @@ body {
   overflow: hidden;
 }
 
-.dark body {
-  --background-color: #121212; /* Dark mode background */
-  --primary-color: #ffffff; /* Light text for dark mode */
-}
-
 .custom-scrollbar {
   overflow-y: hidden !important;
   overflow-x: hidden !important;
