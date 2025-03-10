@@ -12,7 +12,7 @@ import { useSettings } from '@core/hooks/useSettings'
 
 // import PerfectScrollbarWrapper from './PerfectScrollbar'
 
-const NewsReader = ({ newsData, activeId, activeTab, fontSize }) => {
+const NewsReader = ({ newsData, activeId, activeTab, fontSize, loadingArticle }) => {
   const activeNews = newsData.find(news => news.id === activeId)
 
   // Settings hook
@@ -31,7 +31,14 @@ const NewsReader = ({ newsData, activeId, activeTab, fontSize }) => {
 
   return (
     <div className={`p-4 rounded-lg`}>
-      {activeNews ? (
+      {loadingArticle ? (
+        <>
+          <div className='flex justify-center items-center mt-40'>
+            <img src={qubicwebgif.src} alt='Loading...' className='w-[200px] h-[200px]' />
+            <p className='text-lg text-orange-500 mt-4'>Fetching article...</p>
+          </div>
+        </>
+      ) : activeNews ? (
         <>
           {activeTab === 'original' ? (
             <div className='flex justify-center items-center mt-40'>
@@ -56,7 +63,7 @@ const NewsReader = ({ newsData, activeId, activeTab, fontSize }) => {
               </h1>
 
               <Divider orientation='horizontal' className='mb-4' />
-              <PerfectScrollbar className='h-[calc(76vh-60px)]'>
+              <PerfectScrollbar className='h-[calc(78vh-30px)]'>
                 <div
                   className={`${settings.mode === 'dark' ? 'text-white-700' : 'text-gray-700'}`}
                   dangerouslySetInnerHTML={{ __html: activeNews.fullContent }}
