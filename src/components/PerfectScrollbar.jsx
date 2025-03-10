@@ -8,8 +8,14 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 
 const PerfectScrollbarWrapper = ({ children, onScroll }) => {
   return (
-    <PerfectScrollbar className='h-[calc(100vh-120px)] custom-scrollbar' onScroll={onScroll}>
-      {children}
+    <PerfectScrollbar
+      className='custom-scrollbar'
+      onScroll={onScroll}
+      style={{ height: 'calc(100vh - 90px)' }} // Fallback for unsupported Tailwind classes
+    >
+      <div className='h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] xl:h-[calc(100vh-80px)] 2xl:h-[calc(100vh-60px)]'>
+        {children}
+      </div>
     </PerfectScrollbar>
   )
 }
