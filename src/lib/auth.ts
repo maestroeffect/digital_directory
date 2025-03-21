@@ -116,5 +116,25 @@ export const authOptions: NextAuthOptions = {
         }
       }
     }
+  },
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Ensure this is true in production
+        sameSite: 'lax',
+        path: '/'
+      }
+    },
+    callbackUrl: {
+      name: 'next-auth.callback-url',
+      options: {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      }
+    }
   }
 }
