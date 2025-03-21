@@ -29,10 +29,12 @@ const NewsList = ({ loading, onScroll }) => {
   }, [status, session])
 
   useEffect(() => {
-    // Reset active news item when the feed changes
-    setActiveId(null)
-    setBookmarked(new Set()) // Reset bookmarks when switching feeds
-  }, [newsData, setActiveId])
+    // Reset active news item when the feed changes, but don't reset if it's already set
+    if (!activeId) {
+      setActiveId(null)
+      setBookmarked(new Set()) // Reset bookmarks when switching feeds
+    }
+  }, [newsData, activeId, setActiveId])
 
   const fetchBookmarkedNews = async () => {
     try {
