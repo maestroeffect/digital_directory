@@ -3,42 +3,36 @@
 import { useEffect, useState } from 'react'
 
 import { Bookmark, BookmarkBorder } from '@mui/icons-material'
-
 import PerfectScrollbar from 'react-perfect-scrollbar'
-
 import { useSession } from 'next-auth/react'
-
 import { toast } from 'react-toastify'
-
 import Swal from 'sweetalert2'
 
 import PerfectScrollbarWrapper from './PerfectScrollbar'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
-
 import qubicwebgif from '../assets/img/logo.gif'
 import { useNews } from '@/context/NewsContext'
 
 const NewsList = ({ loading, onScroll }) => {
   const { newsData, activeId, setActiveId, handleNewsClick } = useNews()
-
   const { data: session, status } = useSession()
-
-  // Settings hook
   const { settings } = useSettings()
 
   const [bookmarked, setBookmarked] = useState(new Set())
-  const [activeFeedId, setActiveFeedId] = useState(null) // Define it here locally
 
   useEffect(() => {
-    console.log('Session Data:', session)
-    console.log('Auth Status:', status)
-
     if (status === 'authenticated' && session?.user?.id) {
       fetchBookmarkedNews()
     }
   }, [status, session])
+
+  useEffect(() => {
+    // Reset active news item when the feed changes
+    setActiveId(null)
+    setBookmarked(new Set()) // Reset bookmarks when switching feeds
+  }, [newsData, setActiveId])
 
   const fetchBookmarkedNews = async () => {
     try {
@@ -60,8 +54,6 @@ const NewsList = ({ loading, onScroll }) => {
 
       return
     }
-
-    console.log('✅ Bookmarking News Item:', newsItem)
 
     if (status !== 'authenticated' || !session?.user?.id) {
       toast.error('You must be logged in to bookmark news.')
@@ -106,8 +98,6 @@ const NewsList = ({ loading, onScroll }) => {
 
       const text = await response.text()
 
-      console.log('📩 Raw API Response:', text)
-
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${text}`)
       }
@@ -138,13 +128,13 @@ const NewsList = ({ loading, onScroll }) => {
               key={news.id}
               onClick={() => handleNewsClick(news.id)}
               className={`p-3 border rounded-lg relative cursor-pointer hover:${settings.mode === 'dark' ? 'bg-gray-100 hover:text-[#F97316]' : 'bg-gray-100'}
-            ${
-              settings.mode === 'dark' && news.id === activeId
-                ? 'bg-orange-100 border-orange-500 text-[#000]'
-                : settings.mode === 'light' && news.id === activeId
-                  ? 'bg-orange-100 border-orange-500'
-                  : 'bg-dark border-gray-300'
-            } transition group`}
+              ${
+                settings.mode === 'dark' && news.id === activeId
+                  ? 'bg-orange-100 border-orange-500 text-[#000]'
+                  : settings.mode === 'light' && news.id === activeId
+                    ? 'bg-orange-100 border-orange-500'
+                    : 'bg-dark border-gray-300'
+              } transition group`}
             >
               {/* ID Badge */}
               <div
@@ -158,7 +148,7 @@ const NewsList = ({ loading, onScroll }) => {
                 {news.id}
               </div>
 
-              {/* Content section with enough padding on the left to avoid overlap with the ID badge */}
+              {/* Content section */}
               <div className='flex justify-between pl-10'>
                 <div className='flex-1'>
                   <h3
@@ -172,12 +162,10 @@ const NewsList = ({ loading, onScroll }) => {
                     <span>{news.source}</span>
                     <span>·</span>
                     <span>{news.publishedDate}</span>
-                    {/* <span>·</span>
-                  <span>{news.time}</span> */}
                   </div>
                 </div>
 
-                {/* Bookmark icon will only show on hover of the card */}
+                {/* Bookmark icon */}
                 {status === 'unauthenticated' ? null : (
                   <div
                     onClick={e => {
@@ -205,7 +193,7 @@ const NewsList = ({ loading, onScroll }) => {
           </div>
         )}
 
-        {/* Show "Select a News Feed" if no news has been clicked */}
+        {/* "Select a News Feed" Message */}
         {!loading && !activeId && (
           <div className='p-4 text-center flex flex-col items-center mt-5 bg-white border-gray-300 text-gray-500'>
             <img src={qubicwebgif.src} className='w-[80px] h-[80px]' alt='Select a News Feed' />
@@ -213,7 +201,7 @@ const NewsList = ({ loading, onScroll }) => {
           </div>
         )}
 
-        {/* Show "No More Content" if a news item is selected but no more news is available */}
+        {/* "No More Content" Message */}
         {!loading && activeId && newsData.length === 0 && (
           <div className='p-4 text-center flex flex-col items-center mt-5 bg-white border-gray-300 text-gray-500'>
             <img src={qubicwebgif.src} className='w-[80px] h-[80px]' alt='No More Content' />

@@ -1,4 +1,15 @@
 {
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "aws-sdk",
+      "core-js",
+      "esbuild",
+      "prisma",
+      "sharp"
+    ]
+  },
   "name": "qubicweb-digital-directory",
   "version": "5.0.0",
   "license": "Commercial",
