@@ -15,7 +15,7 @@ const SourcePage = () => {
   const [activeId, setActiveId] = useState(null)
   const [loading, setLoading] = useState(false)
   const [loadingArticle, setLoadingArticle] = useState(false) // Track loading state for Mercury fetch
-  const [displayedCount, setDisplayedCount] = useState(7)
+  const [displayedCount, setDisplayedCount] = useState(20)
 
   const params = useParams()
   const source = params.slug

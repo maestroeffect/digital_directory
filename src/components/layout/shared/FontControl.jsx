@@ -6,12 +6,11 @@ import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 
-const FontControl = () => {
+const FontControl = ({ fontSize, setFontSize }) => {
   const [open, setOpen] = useState(false)
-  const [fontSize, setFontSize] = useState(16)
 
   const toggleOpen = () => setOpen(prev => !prev)
-  const increaseFont = () => setFontSize(prev => prev + 2)
+  const increaseFont = () => setFontSize(prev => prev + 2, 100)
   const decreaseFont = () => setFontSize(prev => Math.max(prev - 2, 10))
 
   return (

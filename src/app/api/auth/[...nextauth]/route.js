@@ -1,30 +1,13 @@
+import { NextResponse } from 'next/server'
+
 import NextAuth from 'next-auth'
-import Google from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 
-const handler = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
-    })
-  ],
+import { authOptions } from '@/lib/auth'
 
-  callbacks: {
-    async jwt(token, user, account, profile, isNewUser) {
-      if (user) {
-        token.id = user.id
-      }
+// const prisma = new PrismaClient()
 
-      return token
-    },
+const handler = NextAuth(authOptions)
 
-    async session(session, token) {
-      session.user = token.id
-
-      return session
-    }
-  },
-
-  // A database is required to persist users across multiple sessions
-  database: process.env.DATABASE_URL
-})
+export { handler as GET, handler as POST }

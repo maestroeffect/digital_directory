@@ -10,7 +10,7 @@ const Home = () => {
   const [newsData, setNewsData] = useState([])
   const [activeId, setActiveId] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [displayedCount, setDisplayedCount] = useState(7) // Track number of displayed news items
+  const [displayedCount, setDisplayedCount] = useState(20) // Track number of displayed news items
 
   // Function to fetch news from the RSS feed
   const fetchNews = async () => {
@@ -23,7 +23,7 @@ const Home = () => {
 
       // Extract items from the JSON response
       const items = data.items.map((item, index) => ({
-        id: index + 1, // Use index as a unique ID for simplicity
+        id: index, // Use index as a unique ID for simplicity
         title: item.title,
         link: item.link,
         contentSnippet: item.contentSnippet,

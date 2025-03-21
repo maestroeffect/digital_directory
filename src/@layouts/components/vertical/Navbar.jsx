@@ -54,7 +54,8 @@ const Navbar = props => {
         [verticalLayoutClasses.headerDetached]: !headerFloating && headerDetached,
         [verticalLayoutClasses.headerAttached]: !headerFloating && headerAttached,
         [verticalLayoutClasses.headerBlur]: headerBlur,
-        [verticalLayoutClasses.headerContentCompact]: headerContentCompact,
+
+        // [verticalLayoutClasses.headerContentCompact]: headerContentCompact,
         [verticalLayoutClasses.headerContentWide]: headerContentWide,
         scrolled: trigger
       })}

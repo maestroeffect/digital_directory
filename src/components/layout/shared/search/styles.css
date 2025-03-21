@@ -74,6 +74,9 @@
   align-items: center;
   gap: 8px;
   padding-inline: 16px;
+  padding-block: 30px;
+  padding-inline-start: 10px;
+  border-block-end: #b3b2b2 1px solid;
 }
 
 .active-searchItem {

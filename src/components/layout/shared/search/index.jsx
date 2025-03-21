@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 
 // Next Imports
-import { useParams, useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 // MUI Imports
 import IconButton from '@mui/material/IconButton'
@@ -22,144 +22,104 @@ import NoResult from './NoResult'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useSettings } from '@core/hooks/useSettings'
 
-// Util Imports
-// import { getLocalizedUrl } from '@/utils/i18n'
+// Context Imports
+import { useNews } from '@/context/NewsContext'
 
 // Style Imports
 import './styles.css'
 
-// Data Imports
-import data from '@/data/searchData'
+// Helper function to filter results globally
+const filterResultsGlobally = (newsData, query) => {
+  if (!newsData || !Array.isArray(newsData)) return [] // Ensure newsData exists
 
-// Transform the data to group items by their sections
-const transformedData = data.reduce((acc, item) => {
-  const existingSection = acc.find(section => section.title === item.section)
+  const searchQuery = query.trim().toLowerCase()
 
-  const newItem = {
-    id: item.id,
-    name: item.name,
-    url: item.url,
-    excludeLang: item.excludeLang,
-    icon: item.icon,
-    shortcut: item.shortcut
-  }
+  return newsData
+    .filter(news => {
+      const title = news?.title?.toLowerCase() || ''
+      const snippet = news?.contentSnippet?.toLowerCase() || ''
 
-  if (existingSection) {
-    existingSection.items.push(newItem)
-  } else {
-    acc.push({ title: item.section, items: [newItem] })
-  }
-
-  return acc
-}, [])
-
-// SearchItem Component for introduce the shortcut keys
-const SearchItem = ({ children, shortcut, value, currentPath, url, onSelect = () => {} }) => {
-  return (
-    <CommandItem
-      onSelect={onSelect}
-      value={value}
-      className={classnames({
-        'active-searchItem': currentPath === url
-      })}
-    >
-      {children}
-      {shortcut && (
-        <div cmdk-vercel-shortcuts=''>
-          {shortcut.split(' ').map(key => {
-            return <kbd key={key}>{key}</kbd>
-          })}
-        </div>
-      )}
-    </CommandItem>
-  )
+      return title.includes(searchQuery) || snippet.includes(searchQuery)
+    })
+    .map(news => ({
+      ...news,
+      source: news.source || 'Unknown Source'
+    }))
 }
 
-// Helper function to filter and limit results per section based on the number of sections
-const getFilteredResults = sections => {
-  const limit = sections.length > 1 ? 3 : 5
+// Get search history from localStorage
+const getSearchHistory = () => {
+  if (typeof window !== 'undefined') {
+    return JSON.parse(localStorage.getItem('searchHistory')) || []
+  }
 
-  return sections.map(section => ({
-    ...section,
-    items: section.items.slice(0, limit)
-  }))
+  return []
 }
 
-// Footer component for the search menu
-const CommandFooter = () => {
-  return (
-    <div cmdk-footer=''>
-      <div className='flex items-center gap-1'>
-        <kbd>
-          <i className='ri-arrow-up-line text-base' />
-        </kbd>
-        <kbd>
-          <i className='ri-arrow-down-line text-base' />
-        </kbd>
-        <span>to navigate</span>
-      </div>
-      <div className='flex items-center gap-1'>
-        <kbd>
-          <i className='ri-corner-down-left-line text-base' />
-        </kbd>
-        <span>to open</span>
-      </div>
-      <div className='flex items-center gap-1'>
-        <kbd>esc</kbd>
-        <span>to close</span>
-      </div>
-    </div>
-  )
+// Save search history to localStorage
+const saveSearchHistory = searchQuery => {
+  if (!searchQuery) return
+
+  let history = getSearchHistory()
+
+  // Remove duplicates and keep only the latest 5 searches
+  history = [searchQuery, ...history.filter(item => item !== searchQuery)].slice(0, 5)
+
+  localStorage.setItem('searchHistory', JSON.stringify(history))
 }
 
 const NavSearch = () => {
   // States
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
+  const [searchHistory, setSearchHistory] = useState(getSearchHistory())
 
   // Hooks
   const router = useRouter()
   const pathName = usePathname()
   const { settings } = useSettings()
-  const { lang: locale } = useParams()
   const { isBreakpointReached } = useVerticalNav()
 
-  // When an item is selected from the search results
-  const onSearchItemSelect = item => {
-    item.url.startsWith('http') ? window.open(item.url, '_blank') : router.push(item.excludeLang ? item.url : '')
-    setOpen(false)
+  // Context
+  const { newsData, handleNewsClick } = useNews()
+
+  const CommandFooter = () => {
+    return (
+      <div cmdk-footer=''>
+        <div className='flex items-center gap-1'>
+          <kbd>
+            <i className='ri-arrow-up-line text-base' />
+          </kbd>
+          <kbd>
+            <i className='ri-arrow-down-line text-base' />
+          </kbd>
+          <span>to navigate</span>
+        </div>
+        <div className='flex items-center gap-1'>
+          <kbd>
+            <i className='ri-corner-down-left-line text-base' />
+          </kbd>
+          <span>to open</span>
+        </div>
+        <div className='flex items-center gap-1'>
+          <kbd>esc</kbd>
+          <span>to close</span>
+        </div>
+      </div>
+    )
   }
 
-  // Filter the data based on the search query
-  const filteredData = (sections, query) => {
-    const searchQuery = query.trim().toLowerCase()
-
-    return sections
-      .filter(section => {
-        const sectionMatches = section.title.toLowerCase().includes(searchQuery)
-
-        const itemsMatch = section.items.some(
-          item =>
-            item.name.toLowerCase().includes(searchQuery) ||
-            (item.shortcut && item.shortcut.toLowerCase().includes(searchQuery))
-        )
-
-        return sectionMatches || itemsMatch
-      })
-      .map(section => ({
-        ...section,
-        items: section.items.filter(
-          item =>
-            section.title.toLowerCase().includes(searchQuery) ||
-            item.name.toLowerCase().includes(searchQuery) ||
-            (item.shortcut && item.shortcut.toLowerCase().includes(searchQuery))
-        )
-      }))
+  // Handle search item selection
+  const onSearchItemSelect = feed => {
+    saveSearchHistory(feed.title) // Save search to history
+    setSearchHistory(getSearchHistory()) // Update history in state
+    handleNewsClick(feed.id) // Update the active news item in context
+    setOpen(false) // Close search dialog
   }
 
-  const limitedData = getFilteredResults(filteredData(transformedData, searchValue))
+  const hasNewsFeed = newsData && newsData.length > 0
+  const filteredFeeds = filterResultsGlobally(newsData, searchValue)
 
-  // Toggle the menu when ⌘K is pressed
   useEffect(() => {
     const down = e => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -173,12 +133,10 @@ const NavSearch = () => {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
-  // Reset the search value when the menu is closed
   useEffect(() => {
     if (!open && searchValue !== '') {
       setSearchValue('')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   return (
@@ -205,38 +163,27 @@ const NavSearch = () => {
           <i className='ri-close-line cursor-pointer' onClick={() => setOpen(false)} />
         </div>
         <CommandList>
-          {searchValue ? (
-            limitedData.length > 0 ? (
-              limitedData.map((section, index) => (
-                <CommandGroup key={index} heading={section.title.toUpperCase()} className='text-xs'>
-                  {section.items.map((item, index) => {
-                    return (
-                      <SearchItem
-                        shortcut={item.shortcut}
-                        key={index}
-                        currentPath={pathName}
-                        url={getLocalizedUrl(item.url, locale)}
-                        value={`${item.name} ${section.title} ${item.shortcut}`}
-                        onSelect={() => onSearchItemSelect(item)}
-                      >
-                        {item.icon && (
-                          <div className='flex text-xl'>
-                            <i className={item.icon} />
-                          </div>
-                        )}
-                        {item.name}
-                      </SearchItem>
-                    )
-                  })}
-                </CommandGroup>
-              ))
+          {!hasNewsFeed ? (
+            <div className='p-4 text-center text-gray-500'>Please select a News Feed before searching.</div>
+          ) : searchValue ? (
+            filteredFeeds.length > 0 ? (
+              <CommandGroup heading='News' className='text-xs'>
+                {filteredFeeds.map((feed, index) => (
+                  <CommandItem key={index} value={feed.title} onSelect={() => onSearchItemSelect(feed)}>
+                    <div className='flex'>
+                      <div>{feed.title}</div>
+                      <div className='text-xs text-gray-500'>Source: {feed.source}</div>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             ) : (
               <CommandEmpty>
                 <NoResult searchValue={searchValue} setOpen={setOpen} />
               </CommandEmpty>
             )
           ) : (
-            <DefaultSuggestions setOpen={setOpen} />
+            <DefaultSuggestions setOpen={setOpen} searchHistory={searchHistory} />
           )}
         </CommandList>
         <CommandFooter />

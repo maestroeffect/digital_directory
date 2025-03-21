@@ -22,11 +22,12 @@ const LayoutContent = ({ children }) => {
 
   return (
     <StyledMain
-      isContentCompact={contentCompact}
-      className={classnames(verticalLayoutClasses.content, 'flex-auto p-0 overflow-hidden', {
+      className={classnames(verticalLayoutClasses.content, 'flex-auto p-0 overflow-hidden full-body-content', {
         [`${verticalLayoutClasses.contentCompact} is-full`]: contentCompact,
         [verticalLayoutClasses.contentWide]: contentWide
       })}
+
+      // isContentCompact={contentCompact}
     >
       {children}
     </StyledMain>

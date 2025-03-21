@@ -150,6 +150,7 @@ const VerticalNav = props => {
       transitionDuration={transitionDurationContext}
       className={classnames(
         verticalNavClasses.root,
+        `zedindex`,
         {
           [verticalNavClasses.collapsed]: isCollapsedContext,
           [verticalNavClasses.toggled]: isToggledContext,

@@ -6,6 +6,8 @@ import { useRef, useState } from 'react'
 // Next Imports
 import { useRouter } from 'next/navigation'
 
+import { signOut, useSession } from 'next-auth/react'
+
 // MUI Imports
 import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
@@ -21,20 +23,21 @@ import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
 // Hook Imports
+import { toast, ToastContainer } from 'react-toastify'
+
 import { useSettings } from '@core/hooks/useSettings'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
-  width: 8,
-  height: 8,
+  width: 10,
+  height: 10,
   borderRadius: '50%',
-  cursor: 'pointer',
   backgroundColor: 'var(--mui-palette-success-main)',
-  boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
+  border: '2px solid var(--mui-palette-background-paper)'
 })
 
 const UserDropdown = () => {
-  // States
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
 
   // Refs
@@ -44,40 +47,36 @@ const UserDropdown = () => {
   const router = useRouter()
   const { settings } = useSettings()
 
-  const handleDropdownOpen = () => {
-    !open ? setOpen(true) : setOpen(false)
-  }
+  const handleDropdownOpen = () => setOpen(!open)
 
   const handleDropdownClose = (event, url) => {
-    if (url) {
-      router.push(url)
-    }
-
-    if (anchorRef.current && anchorRef.current.contains(event?.target)) {
-      return
-    }
-
+    if (url) router.push(url)
+    if (anchorRef.current && anchorRef.current.contains(event?.target)) return
     setOpen(false)
   }
 
   const handleUserLogout = async () => {
-    // Redirect to login page
-    router.push('/login')
+    try {
+      await signOut({ redirect: true, callbackUrl: '/home' })
+      toast.success('Sign out successful')
+    } catch (error) {
+      toast.error('Error signing out. Please try again.')
+    }
   }
 
   return (
     <>
+      <ToastContainer position='top-right' autoClose={3000} />
       <Badge
-        ref={anchorRef}
         overlap='circular'
-        badgeContent={<BadgeContentSpan onClick={handleDropdownOpen} />}
+        badgeContent={<BadgeContentSpan />}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         className='mis-2'
+        ref={anchorRef}
       >
         <Avatar
-          ref={anchorRef}
-          alt='John Doe'
-          src='/images/avatars/1.png'
+          alt={session?.user?.name || 'User'}
+          src={session?.user?.image || '/images/avatars/default.png'}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -104,30 +103,21 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-4 gap-2' tabIndex={-1}>
-                    <Avatar alt='John Doe' src='/images/avatars/1.png' />
+                    <Avatar
+                      alt={session?.user?.name || 'User'}
+                      src={session?.user?.image || '/images/avatars/default.png'}
+                    />
                     <div className='flex items-start flex-col'>
                       <Typography variant='body2' className='font-medium' color='text.primary'>
-                        John Doe
+                        {session?.user?.name || 'Guest'}
                       </Typography>
-                      <Typography variant='caption'>admin@materialize.com</Typography>
+                      <Typography variant='caption'>{session?.user?.email || 'No email'}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
                   <MenuItem className='gap-3 pli-4' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-user-3-line' />
-                    <Typography color='text.primary'>My Profile</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3 pli-4' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-settings-4-line' />
-                    <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3 pli-4' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-money-dollar-circle-line' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3 pli-4' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-question-line' />
-                    <Typography color='text.primary'>FAQ</Typography>
+                    <i className='ri-bookmark-2-fill' />
+                    <Typography color='text.primary'>My Bookmarks</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-1.5 pli-4'>
                     <Button

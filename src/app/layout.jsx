@@ -1,11 +1,11 @@
+'use client'
+
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
+import { SessionProvider } from 'next-auth/react'
 
 // Third-party Imports
 import 'react-perfect-scrollbar/dist/css/styles.css'
-
-// Util Imports
-import { getSystemMode } from '@core/utils/serverHelpers'
 
 // Style Imports
 import '@/app/globals.css'
@@ -13,25 +13,27 @@ import '@/app/globals.css'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
+import { ToastContainer } from 'react-toastify'
+
 import MobileBlocker from '@/components/MobileBlocker'
+import { NewsProvider } from '@/context/NewsContext'
+import Provider from '@/components/Provider'
 
-export const metadata = {
-  title: 'Digital Directory',
-  description: 'Customize your News Feeds'
-}
-
-const RootLayout = async props => {
-  const { children } = props
-
-  // Vars
-  const systemMode = await getSystemMode()
-  const direction = 'ltr'
-
+const RootLayout = ({ children }) => {
   return (
-    <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
+    <html id='__next' lang='en' dir='ltr' suppressHydrationWarning>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
-        <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
-        <MobileBlocker>{children}</MobileBlocker>
+        <Provider>
+          <InitColorSchemeScript attribute='data' defaultMode='light' />
+          <SessionProvider>
+            <MobileBlocker>
+              <NewsProvider>
+                {children}
+                <ToastContainer position='top-right' autoClose={5000} />
+              </NewsProvider>
+            </MobileBlocker>
+          </SessionProvider>
+        </Provider>
       </body>
     </html>
   )

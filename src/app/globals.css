@@ -159,3 +159,16 @@ body {
 .custom-scrollbar > .ps__thumb-x {
   display: none !important;
 }
+
+.nav-header {
+  padding: 8px !important;
+}
+
+.zedindex {
+  z-index: 20 !important;
+}
+
+.ts-active {
+  background-color: darkorange !important;
+  border-radius: 8px;
+}
