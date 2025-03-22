@@ -50,25 +50,8 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === 'google') {
         let existingUser = await db.user.findUnique({ where: { email: user.email } })
 
-        if (!existingUser) {
-          existingUser = await db.user.create({
-            data: {
-              email: user.email,
-              name: user.name,
-              image: user.image, // ✅ Save Google profile image
-              password: null
-            }
-          })
-        } else {
-          // Ensure image is updated in DB if missing
-          if (!existingUser.image && user.image) {
-            await db.user.update({
-              where: { email: user.email },
-              data: { image: user.image }
-            })
-          }
-
-          // Link Google account if not already linked
+        if (existingUser) {
+          // If user exists but has no linked Google account, link it
           const existingAccount = await db.account.findFirst({
             where: { userId: existingUser.id, provider: 'google' }
           })
@@ -82,9 +65,29 @@ export const authOptions: NextAuthOptions = {
               }
             })
           }
-        }
 
-        user.id = existingUser.id.toString()
+          user.id = existingUser.id.toString()
+        } else {
+          // Create user for new Google sign-in
+          existingUser = await db.user.create({
+            data: {
+              email: user.email,
+              name: user.name,
+              image: user.image,
+              password: null
+            }
+          })
+
+          await db.account.create({
+            data: {
+              userId: existingUser.id,
+              provider: 'google',
+              providerAccountId: account.providerAccountId
+            }
+          })
+
+          user.id = existingUser.id.toString()
+        }
       }
 
       return true
@@ -114,26 +117,6 @@ export const authOptions: NextAuthOptions = {
           email: token.email,
           image: token.picture
         }
-      }
-    }
-  },
-  cookies: {
-    sessionToken: {
-      name: 'next-auth.session-token',
-      options: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Ensure this is true in production
-        sameSite: 'lax',
-        path: '/'
-      }
-    },
-    callbackUrl: {
-      name: 'next-auth.callback-url',
-      options: {
-        httpOnly: false,
-        secure: false,
-        sameSite: 'lax',
-        path: '/'
       }
     }
   }
