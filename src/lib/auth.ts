@@ -8,7 +8,7 @@ import { db } from './db'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-  session: { strategy: 'jwt' },
+  session: { strategy: 'jwt', maxAge: 600 },
 
   providers: [
     CredentialsProvider({
