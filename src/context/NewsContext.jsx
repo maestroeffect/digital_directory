@@ -23,6 +23,15 @@ export const NewsProvider = ({ children }) => {
 
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
 
+  // Function to detect YouTube links and extract video ID
+  const isYouTubeLink = url => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
+
+    // console.log('YT:', match[1])
+
+    return match ? match[1] : null
+  }
+
   const fetchNews = async () => {
     if (!source) return
     setLoading(true)
@@ -37,17 +46,24 @@ export const NewsProvider = ({ children }) => {
 
       const filteredItems = items
         .filter(item => item.source && generateSlug(item.source) === source)
-        .map((item, index) => ({
-          id: index,
-          title: item.title,
-          link: item.link,
-          source: item.source || 'Unknown Source',
-          contentSnippet: item.contentSnippet,
-          publishedDate: item.publishedDate,
-          image: item.image || '',
-          fullContent: '',
-          additionalImages: []
-        }))
+        .map((item, index) => {
+          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
+
+          //  console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+
+          return {
+            id: index,
+            title: item.title,
+            link: item.link,
+            source: item.source || 'Unknown Source',
+            contentSnippet: item.contentSnippet,
+            publishedDate: item.publishedDate,
+            image: item.image || '',
+            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
+            videoId, // Store YouTube video ID
+            additionalImages: []
+          }
+        })
 
       setNewsData(filteredItems)
     } catch (error) {
@@ -96,7 +112,8 @@ export const NewsProvider = ({ children }) => {
   const handleNewsClick = async id => {
     const selectedNews = newsData.find(news => news.id === id)
 
-    if (!selectedNews || selectedNews.fullContent) {
+    // If it's a YouTube video or already has content, just set it as active
+    if (!selectedNews || selectedNews.fullContent || selectedNews.videoId) {
       setActiveId(id)
 
       return

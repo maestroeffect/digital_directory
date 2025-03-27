@@ -23,6 +23,13 @@ const SourcePage = () => {
   // Function to generate slug from source name
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
 
+  // Function to detect YouTube links and extract video ID
+  const isYouTubeLink = url => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
+
+    return match ? match[1] : null
+  }
+
   // Fetch and filter news (without Mercury)
   const fetchNews = async () => {
     if (!source) return
@@ -37,19 +44,25 @@ const SourcePage = () => {
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
+      // Process each news item
       const filteredItems = items
         .filter(item => item.source && generateSlug(item.source) === source)
-        .map((item, index) => ({
-          id: index,
-          title: item.title,
-          link: item.link,
-          source: item.source || 'Unknown Source',
-          contentSnippet: item.contentSnippet,
-          publishedDate: item.publishedDate,
-          image: item.image || '',
-          fullContent: '', // Will be fetched when clicked
-          additionalImages: []
-        }))
+        .map((item, index) => {
+          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
+
+          return {
+            id: index,
+            title: item.title,
+            link: item.link,
+            source: item.source || 'Unknown Source',
+            contentSnippet: item.contentSnippet,
+            publishedDate: item.publishedDate,
+            image: item.image || '',
+            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
+            videoId, // Store YouTube video ID
+            additionalImages: []
+          }
+        })
 
       console.log(`Fetched News for ${source}:`, filteredItems)
       setNewsData(filteredItems)
@@ -126,7 +139,8 @@ const SourcePage = () => {
   const handleNewsClick = async id => {
     const selectedNews = newsData.find(news => news.id === id)
 
-    if (!selectedNews || selectedNews.fullContent) {
+    // If it's a YouTube video or already has content, just set it as active
+    if (!selectedNews || selectedNews.fullContent || selectedNews.videoId) {
       setActiveId(id)
 
       return

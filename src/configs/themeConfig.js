@@ -20,8 +20,8 @@ const themeConfig = {
   homePageUrl: '/home',
   settingsCookieName: 'materialize-mui-next-demo-1',
   mode: 'light', // 'system', 'light', 'dark'
-  skin: 'default', // 'default', 'bordered'
-  semiDark: false, // true, false
+  skin: 'bordered', // 'default', 'bordered'
+  semiDark: true, // true, false
   layout: 'vertical', // 'vertical', 'collapsed', 'horizontal'
   layoutPadding: 20, // Common padding for header, content, footer layout components (in px)
   compactContentWidth: 1440, // in px

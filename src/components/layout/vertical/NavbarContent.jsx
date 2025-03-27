@@ -21,6 +21,7 @@ import ViewOriginal from '../shared/ViewOriginal'
 import ShareButton from '../shared/ShareButton'
 import FontControl from '../shared/FontControl'
 import { useNews } from '@/context/NewsContext'
+import MyBookmarks from '../shared/MyBookmarks'
 
 const NavbarContent = () => {
   const { fontSize, setFontSize, newsData, activeId } = useNews() // ✅ Get fontSize from context
@@ -47,7 +48,9 @@ const NavbarContent = () => {
         <ShareButton activeLink={activeLink} /> */}
       </div>
       <div className='flex items-center gap-3'>
-        <LanguageDropdown />
+        {/* <LanguageDropdown /> */}
+        {status === 'unauthenticated' ? null : <MyBookmarks />}
+
         <ModeDropdown />
         <FontControl fontSize={fontSize} setFontSize={setFontSize} />
         {/* ✅ Pass the active link to ViewOriginal & ShareButton */}

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import { useRouter, useSearchParams } from 'next/navigation'
+
 import { Bookmark, BookmarkBorder } from '@mui/icons-material'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { useSession } from 'next-auth/react'
@@ -20,45 +22,65 @@ const NewsList = ({ loading, onScroll }) => {
   const { data: session, status } = useSession()
   const { settings } = useSettings()
 
+  const searchParams = useSearchParams()
+  const [sourceUrl, setSourceUrl] = useState(null)
+
+  useEffect(() => {
+    const sourceUrlParam = searchParams.get('sourceUrl')
+
+    if (sourceUrlParam) {
+      setSourceUrl(sourceUrlParam)
+      setActiveId(null) // ✅ Reset active news when the source changes
+    }
+  }, [searchParams])
+
   const [bookmarked, setBookmarked] = useState(new Set())
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.id) {
-      fetchBookmarkedNews()
+    if (status === 'authenticated' && session?.user?.id && newsData.length > 0) {
+      // Check if the current news is bookmarked
+      fetchBookmarkedNews(newsData) // Pass the entire list of news to check
     }
-  }, [status, session])
-
+  }, [status, session, newsData])
   useEffect(() => {
-    // Reset active news item when the feed changes, but don't reset if it's already set
-    if (!activeId) {
-      setActiveId(null)
-      setBookmarked(new Set()) // Reset bookmarks when switching feeds
+    if (newsData.length > 0 && newsData[0]?.source && typeof newsData[0].source === 'string') {
+      setBookmarked(new Set()) // Clear previous bookmarks
+      fetchBookmarkedNews(newsData[0].source) // Fetch bookmarks for the new
+      // ✅ Reset activeId ONLY when the source actually changes
+      setActiveId(prevId => (newsData.some(news => news.id === prevId) ? prevId : null))
     }
-  }, [newsData, activeId, setActiveId])
+  }, [newsData])
 
-  const fetchBookmarkedNews = async () => {
+  const fetchBookmarkedNews = async selectedSource => {
+    if (!selectedSource || typeof selectedSource !== 'string') {
+      // console.error('Invalid source provided for bookmarks:', selectedSource)
+
+      return
+    }
+
     try {
-      const response = await fetch('/api/auth/bookmarks')
+      const response = await fetch(`/api/auth/bookmarks?source=${encodeURIComponent(selectedSource)}`)
 
       if (!response.ok) throw new Error('Failed to fetch bookmarks')
+
       const data = await response.json()
 
-      setBookmarked(new Set(data.bookmarks.map(bookmark => bookmark.newsId)))
+      // Only store bookmarks that belong to the selected source
+      const filteredBookmarks = new Set(data.bookmarks.map(bookmark => bookmark.news.id))
+
+      setBookmarked(filteredBookmarks)
     } catch (error) {
       console.error('Error fetching bookmarks:', error)
     }
   }
 
   const toggleBookmark = async newsItem => {
-    if (!newsItem || newsItem.id === undefined || newsItem.id === null || !newsItem.title || !newsItem.source) {
-      toast.error('Missing news data. Please try again.')
-      console.error('❌ Missing news data:', newsItem)
+    // console.log(sourceUrl)
 
-      return
-    }
+    console.log('News Item in Bookmark:', newsItem)
 
-    if (status !== 'authenticated' || !session?.user?.id) {
-      toast.error('You must be logged in to bookmark news.')
+    if (!newsItem.id || !newsItem.title || !newsItem.source) {
+      toast.error('Invalid news data.')
 
       return
     }
@@ -76,7 +98,6 @@ const NewsList = ({ loading, onScroll }) => {
 
     if (!confirmAction.isConfirmed) return
 
-    // Optimistic UI update
     setBookmarked(prev => {
       const updated = new Set(prev)
 
@@ -94,22 +115,19 @@ const NewsList = ({ loading, onScroll }) => {
           title: newsItem.title,
           content: newsItem.contentSnippet || 'No content available.',
           source: newsItem.source,
+          newsUrl: newsItem.link, // 🔹 Add URL here
+          sourceUrl,
           publishedAt: newsItem.publishedDate || new Date().toISOString()
         })
       })
 
-      const text = await response.text()
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${text}`)
-      }
+      if (!response.ok) throw new Error(`Error ${response.status}: ${await response.text()}`)
 
       toast.success(isBookmarked ? 'Bookmark removed successfully' : 'News bookmarked successfully')
     } catch (error) {
       console.error('❌ Bookmark update error:', error)
       toast.error('Something went wrong!')
 
-      // Rollback UI if API call fails
       setBookmarked(prev => {
         const rollback = new Set(prev)
 
@@ -140,7 +158,7 @@ const NewsList = ({ loading, onScroll }) => {
             >
               {/* ID Badge */}
               <div
-                className='absolute top-4 left-3 bg-black text-white font-bold text-sm flex items-center justify-center'
+                className={`absolute top-4 left-3 ${settings.mode === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} font-bold text-sm flex items-center justify-center`}
                 style={{
                   width: '32px', // Adjust size as needed
                   height: '28px',
@@ -172,7 +190,7 @@ const NewsList = ({ loading, onScroll }) => {
                   <div
                     onClick={e => {
                       e.stopPropagation()
-                      toggleBookmark(news)
+                      toggleBookmark(news, sourceUrl)
                     }}
                     className='text-orange-500 hover:text-gray-500 cursor-pointer opacity-1 group-hover:opacity-100 transition-opacity'
                   >

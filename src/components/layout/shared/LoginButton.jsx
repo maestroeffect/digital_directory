@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { signIn, useSession } from 'next-auth/react'
 
+import { useSettings } from '@/@core/hooks/useSettings'
+
 const LoginButton = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
@@ -20,6 +22,8 @@ const LoginButton = () => {
   const { data: session, update } = useSession() // ✅ Get session update function
   const handleSignUpClick = () => setIsSignUp(true)
   const handleLoginClick = () => setIsSignUp(false)
+
+  const { settings } = useSettings()
 
   const handleLogin = async e => {
     e.preventDefault()
@@ -126,7 +130,7 @@ const LoginButton = () => {
   return (
     <>
       <button
-        className='px-4 py-2 text-sm font-semibold text-white bg-black hover:bg-orange-500 transition cursor-pointer'
+        className={`px-4 py-2 text-sm font-semibold ${settings.mode === 'dark' ? 'bg-white text-[#000] hover:text-white' : 'bg-black text-white  '}   hover:bg-orange-500 transition cursor-pointer`}
         onClick={() => setModalOpen(true)}
       >
         Login

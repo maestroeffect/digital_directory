@@ -13,7 +13,7 @@ const ViewOriginal = ({ activeLink }) => {
   if (!activeLink) return null // Hide if no active link
 
   return (
-    <Tooltip title={`Open News in new tab`}>
+    <Tooltip title={`View Source`}>
       <a href={activeLink} target='_blank' rel='noopener noreferrer'>
         <IconButton className='text-textPrimary'>
           <i className={settings.mode === 'dark' ? 'ri-external-link-line' : 'ri-external-link-line'} />

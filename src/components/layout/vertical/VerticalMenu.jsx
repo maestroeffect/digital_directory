@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -26,6 +26,7 @@ const VerticalMenu = ({ scrollMenu }) => {
 
   const [feedSources, setFeedSources] = useState([])
   const router = useRouter()
+  const pathname = usePathname() // ✅ Get the current pathname
 
   // Function to generate slugs from source names
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
@@ -47,12 +48,17 @@ const VerticalMenu = ({ scrollMenu }) => {
         feedItems.forEach(item => {
           if (!item.source) return // Skip if source is missing
 
+          const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com'
+
           const title = item.source
           const slug = generateSlug(title)
           const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico`
 
+          // Generate dynamic source URL
+          const sourceUrl = `${baseUrl}/${slug}`
+
           if (!feedsMap.has(title)) {
-            feedsMap.set(title, { name: title, slug, favicon })
+            feedsMap.set(title, { name: title, slug, favicon, sourceUrl })
           }
         })
 
@@ -68,8 +74,10 @@ const VerticalMenu = ({ scrollMenu }) => {
     fetchFeedSources()
   }, [])
 
-  const handleMenuClick = (slug, name) => {
-    router.push(`/${slug}?source=${encodeURIComponent(name)}`)
+  const handleMenuClick = (slug, name, sourceUrl) => {
+    router.push(`/${slug}?source=${encodeURIComponent(name)}&sourceUrl=${encodeURIComponent(sourceUrl)}`, {
+      scroll: false
+    })
   }
 
   return (
@@ -90,21 +98,28 @@ const VerticalMenu = ({ scrollMenu }) => {
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        {feedSources.map((feed, index) => (
-          <MenuItem
-            key={`${feed.name}-${index}`}
-            href={`/${feed.slug}`}
-            icon={<img src={feed.favicon} alt={feed.name} width='24' height='24' />}
-            style={{
-              position: 'relative',
-              cursor: 'pointer',
-              color: theme.palette.mode === 'dark' ? '#fff' : 'inherit'
-            }}
-            onClick={() => handleMenuClick(feed.slug, feed.name)}
-          >
-            {feed.name}
-          </MenuItem>
-        ))}
+        {feedSources.map((feed, index) => {
+          const isActive = pathname === `/${feed.slug}` // ✅ Check if active
+
+          return (
+            <MenuItem
+              key={`${feed.name}-${index}`}
+              href={`/${feed.slug}?source=${encodeURIComponent(feed.name)}&sourceUrl=${encodeURIComponent(feed.sourceUrl)}`}
+              icon={<img src={feed.favicon} alt={feed.name} width='24' height='24' />}
+              style={{
+                position: 'relative',
+                cursor: 'pointer',
+                color: theme.palette.mode === 'dark' ? '#fff' : 'inherit',
+                fontWeight: isActive ? 'bold' : 'normal', // ✅ Highlight active link
+                backgroundColor: isActive ? '#F97316' : 'transparent', // ✅ Active bg color
+                borderRadius: '8px' // Optional: Smooth highlight
+              }}
+              onClick={() => handleMenuClick(feed.slug, feed.name, feed.sourceUrl)}
+            >
+              {feed.name}
+            </MenuItem>
+          )
+        })}
       </Menu>
     </ScrollWrapper>
   )

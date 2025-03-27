@@ -39,7 +39,7 @@ const Home = () => {
       }))
 
       // Log the fetched items
-      console.log('Fetched News Items:', items)
+      // console.log('Fetched News Items:', items)
 
       // Update state with fetched news data
       setNewsData(items)

@@ -53,10 +53,28 @@ const NewsReader = () => {
 
           <Divider orientation='horizontal' className='mb-4' />
           <PerfectScrollbar className='h-[calc(78vh-30px)] lg:h-[calc(78vh-30px)] xl:h-[calc(90vh-30px)] 2xl:h-[calc(90vh-30px)]'>
-            <div
-              className={`${settings.mode === 'dark' ? 'text-white-700' : 'text-gray-700'}`}
-              dangerouslySetInnerHTML={{ __html: activeNews.fullContent }}
-            />
+            {/* If it's a YouTube video, embed the player */}
+            {activeNews.videoId ? (
+              <>
+                <div className='flex justify-center mt-4'>
+                  <iframe
+                    width='100%'
+                    height='400'
+                    src={`https://www.youtube.com/embed/${activeNews.videoId}`}
+                    frameBorder='0'
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                {/* <div>
+                  <p className='text-sm text-gray-600'>Video duration: {activeNews.contentSnippet}</p>
+                </div> */}
+              </>
+            ) : (
+              <div
+                className={`${settings.mode === 'dark' ? 'text-white-700' : 'text-gray-700'}`}
+                dangerouslySetInnerHTML={{ __html: activeNews.fullContent || 'Content not available' }}
+              />
+            )}
           </PerfectScrollbar>
         </div>
       )}

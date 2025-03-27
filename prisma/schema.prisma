@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,53 +7,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   name      String?
-  password  String?   // ✅ Password can be null for OAuth users
-  image     String?   // ✅ Store profile image from Google
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  password  String? // ✅ Password can be null for OAuth users
+  image     String? // ✅ Store profile image from Google
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   bookmarks Bookmark[]
   accounts  Account[]
 }
 
 model Account {
-  id                 Int     @id @default(autoincrement())
-  userId             Int
-  provider           String
-  providerAccountId  String
-  createdAt          DateTime @default(now())
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  provider          String
+  providerAccountId String
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
+model Source {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  sourceUrl String   @unique // ✅ Added source URL
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  news      News[]
+  bookmarks Bookmark[] // ✅ Add this to establish the relation
+}
 
 model News {
   id          Int      @id @default(autoincrement())
   title       String
   content     String
-  source      String
+  url         String   // Add this line
+  sourceId    Int
   publishedAt DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // You can add relations to users here or other models if needed
-  bookmarks   Bookmark[]
+  source    Source     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  bookmarks Bookmark[]
 }
 
 model Bookmark {
   id        Int      @id @default(autoincrement())
   userId    Int
   newsId    Int
+  sourceId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id])
-  news      News     @relation(fields: [newsId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  news   News   @relation(fields: [newsId], references: [id])
+  source Source @relation(fields: [sourceId], references: [id])
 
-  @@unique([userId, newsId]) // Ensure a user can bookmark the same news only once
+@@unique([userId, sourceId, newsId]) // Ensures uniqueness within each source
+
+  @@index([userId, sourceId]) // Index for quick lookups
 }

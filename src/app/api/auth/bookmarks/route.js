@@ -7,41 +7,79 @@ import { db } from '@/lib/db'
 
 // Handle POST request to save a bookmark
 export async function POST(req) {
+  // try {
+  //   const body = await req.json() // Await req.json() once
+  //   console.log('📩 Incoming Request Data:', body) // Log the full request body
+
+  //   return NextResponse.json({ message: 'Check your server logs for the request body.' })
+  // } catch (error) {
+  //   console.error('❌ Error reading request JSON:', error)
+  //   return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  // }
   const session = await getServerSession(authOptions)
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { newsId, title, content, source, publishedAt } = await req.json()
+  const { newsId, title, content, source, newsUrl, sourceUrl, publishedAt } = await req.json()
 
-  if (newsId === null || newsId === undefined || !title || !content || !source || !publishedAt) {
+  if (
+    newsId === null ||
+    newsId === undefined ||
+    !title ||
+    !content ||
+    !newsUrl ||
+    !sourceUrl ||
+    !source ||
+    !publishedAt
+  ) {
     return NextResponse.json({ error: 'Missing news data' }, { status: 400 })
   }
 
   try {
     const userId = parseInt(session.user.id, 10)
 
-    // Check if news already exists in DB, otherwise insert it
-    let news = await db.news.findUnique({
-      where: { id: newsId }
+    // 🔹 Find or create the source
+    let sourceRecord = await db.source.findUnique({
+      where: { name: source }
+    })
+
+    if (!sourceRecord) {
+      sourceRecord = await db.source.create({
+        data: { name: source, sourceUrl: sourceUrl }
+      })
+    }
+
+    // 🔹 Find or create the news item in the specific source
+    let news = await db.news.findFirst({
+      where: {
+        title,
+        sourceId: sourceRecord.id // Ensure news is unique per source
+      }
     })
 
     if (!news) {
       news = await db.news.create({
         data: {
-          id: newsId, // Assuming `newsId` is unique from API
           title,
           content,
-          source,
+          url: newsUrl,
+          sourceId: sourceRecord.id,
           publishedAt: new Date(publishedAt)
         }
       })
     }
 
+    console.log('📰 News Found/Created:', news.id)
     // Save bookmark
     await db.bookmark.create({
-      data: { userId, newsId }
+      data: {
+        userId,
+        newsId: news.id,
+        sourceId: news.sourceId // use sourceId here
+        // user: { connect: { id: userId } } // Connecting the user with the bookmark
+      }
     })
 
     return NextResponse.json({ message: 'Bookmark saved' }, { status: 201 })
@@ -95,11 +133,12 @@ export async function DELETE(req) {
 }
 
 // Handle GET request to fetch user's bookmarks
+// Handle GET request to fetch user's bookmarks
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
 
-    console.log('🔍 Session Data:', session)
+    // console.log('🔍 Session Data:', session)
 
     if (!session || !session.user?.id) {
       console.error('❌ Unauthorized request - No valid session found.')
@@ -115,12 +154,32 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 })
     }
 
-    console.log('✅ Authenticated User ID:', userId)
+    // Extract source from query params
+    const { searchParams } = new URL(req.url)
+    const sourceName = searchParams.get('source')
 
-    // Fetch bookmarks with the actual news data
+    if (!sourceName) {
+      return NextResponse.json({ error: 'Source name is required' }, { status: 400 })
+    }
+
+    // Fetch the source record
+    const sourceRecord = await db.source.findUnique({
+      where: { name: sourceName }
+    })
+
+    if (!sourceRecord) {
+      return NextResponse.json({ bookmarks: [] }, { status: 200 }) // No bookmarks if source doesn't exist
+    }
+
+    // Fetch all bookmarks for the user, including the related news and source info
     const bookmarks = await db.bookmark.findMany({
-      where: { userId },
-      include: { news: true } // Fetch the related news data
+      where: {
+        userId,
+        sourceId: sourceRecord.id
+      },
+      include: {
+        news: true // Fetch related news data
+      }
     })
 
     console.log('📌 Bookmarks retrieved:', bookmarks)
