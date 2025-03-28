@@ -9,6 +9,8 @@ import { toast } from 'react-toastify'
 
 import PerfectScrollbarWrapper from '@/components/PerfectScrollbar'
 import { useSettings } from '@/@core/hooks/useSettings'
+import qubicwebgifwhite from '@assets/img/logo_white.gif'
+import qubicwebgif from '@/assets/img/logo.gif'
 
 const Bookmarks = ({ onScroll }) => {
   const { data: session, status } = useSession()
@@ -17,7 +19,7 @@ const Bookmarks = ({ onScroll }) => {
   const [loading, setLoading] = useState(true)
   const [images, setImages] = useState({})
 
-  const settings = useSettings()
+  const { settings } = useSettings()
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -124,7 +126,17 @@ const Bookmarks = ({ onScroll }) => {
     }
   }
 
-  if (status === 'loading' || loading) return <p>Loading bookmarks...</p>
+  if (status === 'loading' || loading)
+    return (
+      <div className='flex flex-col items-center justify-center h-screen'>
+        <img
+          src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+          className='w-[50px] h-[50px] mb-3'
+          alt='Loading...'
+        />
+        <p className='animate-pulse text-lg font-semibold text-gray-600 dark:text-black'>Loading bookmarks...</p>
+      </div>
+    )
   if (!session) return <p>Please log in to view bookmarks.</p>
 
   return (
@@ -139,25 +151,27 @@ const Bookmarks = ({ onScroll }) => {
               newsList.map(bookmark => (
                 <div
                   key={bookmark.id}
-                  className={`group relative ${settings.mode === 'dark' ? '' : ''} bg-white border border-orang-300 rounded-lg shadow-sm p-4 transition-all duration-300 hover:shadow-orange-400/50 hover:shadow-lg flex flex-col h-full`}
+                  className={`group relative ${settings.mode === 'dark' ? 'bg-dark border-orange-300' : 'shadow-sm hover:shadow-orange-400/50 hover:shadow-lg'}  border  rounded-lg  p-4 transition-all duration-300  flex flex-col h-full`}
                 >
                   <img
                     src={images[bookmark.id] || bookmark.news.image || 'https://placehold.co/600x400'}
                     alt='News'
                     className='w-full h-48 object-cover rounded-lg'
                   />
-                  <h3 className='text-lg font-semibold mt-3'>
+                  <h3 className={`${settings.mode === 'dark' ? 'text-white' : ''} text-lg font-semibold mb-2 mt-3`}>
                     <a
                       href={bookmark.news.url}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-black cursor-pointer hover:text-orange-500 transition'
+                      className={`${settings.mode === 'dark' ? 'text-white' : ''} cursor-pointer hover:text-orange-500 transition`}
                     >
                       {bookmark.news.title}
                     </a>
                   </h3>
                   {/* <p className='text-gray-600 mt-2 text-sm'>{bookmark.news.content.slice(0, 100)}...</p> */}
-                  <div className='mt-auto flex justify-between items-center bg-white pt-4 rounded-b-lg'>
+                  <div
+                    className={`${settings.mode === 'dark' ? 'bg-dark' : ''} mt-auto flex justify-between items-center pt-4 rounded-b-lg`}
+                  >
                     <a
                       href={sourcesMap[source] || '#'}
                       rel='noopener noreferrer'
@@ -176,11 +190,11 @@ const Bookmarks = ({ onScroll }) => {
             )}
           </div>
         )}
-        <div className='flex justify-center mt-6'>
+        {/* <div className='flex justify-center mt-6'>
           <button className='px-5 py-2 text-lg bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer'>
             Load More
           </button>
-        </div>
+        </div> */}
       </PerfectScrollbarWrapper>
     </div>
   )

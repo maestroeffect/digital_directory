@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
@@ -15,6 +15,7 @@ const MyBookmarks = ({ activeLink }) => {
   const { settings, updateSettings } = useSettings()
 
   const router = useRouter()
+  const pathname = usePathname() // Get current route
 
   // if (!activeLink) return null // Hide if no active link
   const { data: session, status } = useSession()
@@ -28,9 +29,14 @@ const MyBookmarks = ({ activeLink }) => {
   }
 
   return (
-    <Tooltip title={`My Bookmarks`}>
-      <IconButton className='text-textPrimary' onClick={handleBookmarkClick}>
-        <i className={settings.mode === 'dark' ? 'ri-bookmark-2-fill' : 'ri-bookmark-2-fill'} />
+    <Tooltip title='My Bookmarks'>
+      <IconButton onClick={handleBookmarkClick}>
+        <i
+          className={`ri-bookmark-2-fill transition-colors duration-300 ${
+            pathname === '/my-bookmarks' ? 'text-orange-500' : settings.mode === 'dark' ? 'text-white' : 'text-black'
+          }`}
+          style={{ fontSize: '24px' }} // Ensure the icon is visible
+        />
       </IconButton>
     </Tooltip>
   )

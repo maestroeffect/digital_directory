@@ -170,9 +170,9 @@ const NavSearch = () => {
               <CommandGroup heading='News' className='text-xs'>
                 {filteredFeeds.map((feed, index) => (
                   <CommandItem key={index} value={feed.title} onSelect={() => onSearchItemSelect(feed)}>
-                    <div className='flex'>
+                    <div className='flex flex-col'>
                       <div>{feed.title}</div>
-                      <div className='text-xs text-gray-500'>Source: {feed.source}</div>
+                      <div className='text-xs pt-1 text-orange-500'>Source: {feed.source}</div>
                     </div>
                   </CommandItem>
                 ))}

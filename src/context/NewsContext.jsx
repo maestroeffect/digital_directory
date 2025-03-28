@@ -131,7 +131,17 @@ export const NewsProvider = ({ children }) => {
 
   return (
     <NewsContext.Provider
-      value={{ newsData, activeId, setActiveId, loading, fontSize, setFontSize, loadingArticle, handleNewsClick }}
+      value={{
+        newsData,
+        setNewsData,
+        activeId,
+        setActiveId,
+        loading,
+        fontSize,
+        setFontSize,
+        loadingArticle,
+        handleNewsClick
+      }}
     >
       {children}
     </NewsContext.Provider>

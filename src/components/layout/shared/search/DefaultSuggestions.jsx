@@ -19,14 +19,14 @@ const DefaultSuggestions = ({ setOpen, searchHistory }) => {
   return (
     <div className='flex flex-wrap gap-8 overflow-y-auto'>
       {defaultSuggestions.map((section, index) => (
-        <div key={index} className='container p-4 flex flex-col gap-4 basis-full sm:basis-1/2'>
+        <div key={index} className='container p-4 flex flex-col gap-4'>
           <p className='text-xs uppercase text-textDisabled'>{section.sectionLabel}</p>
           <ul className='flex flex-col gap-4'>
             {section.items.map((item, i) => (
               <li key={i} className='flex'>
                 <Link
                   href={item.href}
-                  className='flex items-center gap-2 hover:text-primary'
+                  className='flex items-center gap-2 hover:text-[#F97316]'
                   onClick={() => setOpen(false)}
                 >
                   <i className={classnames(item.icon, 'text-xl')} />

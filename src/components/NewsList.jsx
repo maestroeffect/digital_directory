@@ -12,13 +12,15 @@ import Swal from 'sweetalert2'
 
 import PerfectScrollbarWrapper from './PerfectScrollbar'
 
+import qubicwebgifwhite from '@assets/img/logo_white.gif'
+
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 import qubicwebgif from '../assets/img/logo.gif'
 import { useNews } from '@/context/NewsContext'
 
 const NewsList = ({ loading, onScroll }) => {
-  const { newsData, activeId, setActiveId, handleNewsClick } = useNews()
+  const { newsData, setNewsData, activeId, setActiveId, handleNewsClick } = useNews()
   const { data: session, status } = useSession()
   const { settings } = useSettings()
 
@@ -30,6 +32,7 @@ const NewsList = ({ loading, onScroll }) => {
 
     if (sourceUrlParam) {
       setSourceUrl(sourceUrlParam)
+      setNewsData([]) // ✅ Clear the old news list
       setActiveId(null) // ✅ Reset active news when the source changes
     }
   }, [searchParams])
@@ -204,9 +207,14 @@ const NewsList = ({ loading, onScroll }) => {
         {/* Loading Indicator */}
         {loading && (
           <div className='space-y-2 my-2'>
-            <div className='p-4 border rounded-lg bg-white border-gray-300'>
+            <div
+              className={`p-3 border rounded-lg ${settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src} border-gray-300`}
+            >
               <div className='text-center flex flex-col items-center text-gray-500'>
-                <img src={qubicwebgif.src} className='w-[50px] h-[50px]' />
+                <img
+                  src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+                  className='w-[50px] h-[50px]'
+                />
                 <span className='animate-pulse'>Loading...</span>
               </div>
             </div>
@@ -214,18 +222,30 @@ const NewsList = ({ loading, onScroll }) => {
         )}
 
         {/* "Select a News Feed" Message */}
-        {!loading && !activeId && (
-          <div className='p-4 text-center flex flex-col items-center mt-5 bg-white border-gray-300 text-gray-500'>
-            <img src={qubicwebgif.src} className='w-[80px] h-[80px]' alt='Select a News Feed' />
+        {/* {!loading && !activeId && (
+          <div
+            className={`p-3 text-center flex flex-col items-center mt-3 {settings.mode === 'dark' ? 'bg-dark border border-orange-300' : 'border-gray-300 border'} text-gray-500`}
+          >
+            <img
+              src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+              className='w-[50px] h-[50px]'
+              alt='Select a News Feed'
+            />
             <span className='text-lg font-semibold'>Select a News Feed</span>
           </div>
-        )}
+        )} */}
 
         {/* "No More Content" Message */}
-        {!loading && activeId && newsData.length === 0 && (
-          <div className='p-4 text-center flex flex-col items-center mt-5 bg-white border-gray-300 text-gray-500'>
-            <img src={qubicwebgif.src} className='w-[80px] h-[80px]' alt='No More Content' />
-            <span className='text-lg font-semibold'>No more content</span>
+        {!loading && !activeId && newsData.length > 0 && (
+          <div
+            className={`p-2 text-center rounded-lg flex flex-col items-center mt-2 ${settings.mode === 'dark' ? 'bg-dark border border-orange-300' : 'border-gray-300 border'}  text-gray-500`}
+          >
+            <img
+              src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+              className='w-[50px] h-[50px]'
+              alt='No More Content'
+            />
+            <span className='text-lg font-semibold'>End of News List</span>
           </div>
         )}
       </div>

@@ -4,7 +4,7 @@
 import { useRef, useState } from 'react'
 
 // Next Imports
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { signOut, useSession } from 'next-auth/react'
 
@@ -42,6 +42,7 @@ const UserDropdown = () => {
 
   // Refs
   const anchorRef = useRef(null)
+  const pathname = usePathname()
 
   // Hooks
   const router = useRouter()
@@ -62,6 +63,10 @@ const UserDropdown = () => {
     } catch (error) {
       toast.error('Error signing out. Please try again.')
     }
+  }
+
+  const handleBookmarkClick = () => {
+    router.push('/my-bookmarks')
   }
 
   return (
@@ -115,9 +120,12 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='gap-3 pli-4' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-bookmark-2-fill' />
-                    <Typography color='text.primary'>My Bookmarks</Typography>
+                  <MenuItem
+                    className={`gap-3 pli-4 mx-3 ${pathname === '/my-bookmarks' ? 'bg-black rounded-lg text-white' : ''}`}
+                    onClick={handleBookmarkClick}
+                  >
+                    <i className={`ri-bookmark-2-fill `} />
+                    <Typography color='text.primary '>My Bookmarks</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-1.5 pli-4'>
                     <Button
