@@ -159,17 +159,23 @@ const LoginButton = () => {
               transition={{ duration: 0.3 }}
               style={{ zIndex: 500000 }} // Set a very high z-index
             >
-              <div className='bg-white p-8 rounded-lg w-96 relative'>
+              <div
+                className={`${settings.mode === 'dark' ? 'border bg-dark border-orange-500 shadow-md' : 'bg-white'} bg-black p-8 rounded-lg w-96 relative`}
+              >
                 {/* Close Button */}
                 <button
-                  className='absolute top-2 right-2 bg-black text-white text-xl font-bold rounded-full w-8 h-8 flex items-center justify-center cursor-pointer'
+                  className={`absolute top-2 right-2 ${settings.mode === 'dark' ? 'bg-white text-black hover:bg-orange-500 transition hover:text-white' : 'bg-black text-white'} text-xl font-bold rounded-full w-8 h-8 flex items-center justify-center cursor-pointer`}
                   onClick={() => setModalOpen(false)}
                 >
                   &times;
                 </button>
 
                 {/* Toggle between Login and Sign Up */}
-                <h2 className='text-2xl font-semibold mb-4 text-center'>{isSignUp ? 'Sign Up' : 'Login'}</h2>
+                <h2
+                  className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : ''} font-semibold mb-4 text-center`}
+                >
+                  {isSignUp ? 'Sign Up' : 'Login'}
+                </h2>
 
                 {/* Form */}
                 <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
@@ -216,7 +222,7 @@ const LoginButton = () => {
                   {/* Submit Button */}
                   <button
                     type='submit'
-                    className='w-full py-3 bg-black text-white rounded mb-4 cursor-pointer hover:bg-orange-500 transition'
+                    className='w-full py-3 bg-black dark:border dark:border-orange-500 text-white rounded mb-4 cursor-pointer hover:bg-orange-500 transition'
                   >
                     {isSignUp ? 'Sign Up' : 'Login'}
                   </button>
@@ -227,14 +233,20 @@ const LoginButton = () => {
                   {isSignUp ? (
                     <span className='text-sm'>
                       Already have an account?{' '}
-                      <button className='text-blue-500 font-semibold cursor-pointer' onClick={handleLoginClick}>
+                      <button
+                        className={`${settings.mode === 'dark' ? 'text-orange-500 bg-black' : ''} font-semibold cursor-pointer`}
+                        onClick={handleLoginClick}
+                      >
                         Login
                       </button>
                     </span>
                   ) : (
                     <span className='text-sm'>
                       Dont have an account?{' '}
-                      <button className='text-blue-500 font-semibold cursor-pointer' onClick={handleSignUpClick}>
+                      <button
+                        className={`${settings.mode === 'dark' ? 'text-orange-500 bg-black' : ''} font-semibold cursor-pointer`}
+                        onClick={handleSignUpClick}
+                      >
                         Sign Up
                       </button>
                     </span>
