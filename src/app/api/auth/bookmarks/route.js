@@ -72,6 +72,7 @@ export async function POST(req) {
     }
 
     console.log('📰 News Found/Created:', news.id)
+
     // Save bookmark
     await db.bookmark.create({
       data: {
