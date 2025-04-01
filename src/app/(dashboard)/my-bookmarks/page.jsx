@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import { useSession } from 'next-auth/react'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 
@@ -11,13 +13,18 @@ import PerfectScrollbarWrapper from '@/components/PerfectScrollbar'
 import { useSettings } from '@/@core/hooks/useSettings'
 import qubicwebgifwhite from '@assets/img/logo_white.gif'
 import qubicwebgif from '@/assets/img/logo.gif'
+import { useNews } from '@/context/NewsContext'
 
 const Bookmarks = ({ onScroll }) => {
   const { data: session, status } = useSession()
+  const { handleNewsClick, setActiveId } = useNews()
   const [bookmarks, setBookmarks] = useState({})
   const [sourcesMap, setSourcesMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [images, setImages] = useState({})
+
+  // const { router } = useRouter()
+  const router = useRouter()
 
   const { settings } = useSettings()
 
@@ -126,6 +133,24 @@ const Bookmarks = ({ onScroll }) => {
     }
   }
 
+  // New function to handle both navigating and activating the news
+  const handleSourceAndNewsClick = (newsId, sourceName) => {
+    // First, set the active news item
+    // console.log('Hiiis')
+
+    setActiveId(newsId)
+
+    // Then, navigate to the source page, potentially showing the full news list
+    if (sourcesMap[sourceName]) {
+      // window.location.href = sourcesMap[sourceName]
+      console.log(sourcesMap[sourceName])
+
+      router.push(sourcesMap[sourceName])
+    } else {
+      console.error('Source URL not found')
+    }
+  }
+
   if (status === 'loading' || loading)
     return (
       <div className='flex flex-col items-center justify-center h-screen'>
@@ -160,8 +185,11 @@ const Bookmarks = ({ onScroll }) => {
                   />
                   <h3 className={`${settings.mode === 'dark' ? 'text-white' : ''} text-lg font-semibold mb-2 mt-3`}>
                     <a
-                      href={bookmark.news.url}
-                      target='_blank'
+                      onClick={e => {
+                        console.log('Just got clicked')
+                        e.preventDefault() // Prevent the default link behavior
+                        handleSourceAndNewsClick(bookmark.news.id, source) // Call the new function to handle news click
+                      }}
                       rel='noopener noreferrer'
                       className={`${settings.mode === 'dark' ? 'text-white' : ''} cursor-pointer hover:text-orange-500 transition`}
                     >

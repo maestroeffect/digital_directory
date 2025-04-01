@@ -112,6 +112,8 @@ export const NewsProvider = ({ children }) => {
   const handleNewsClick = async id => {
     const selectedNews = newsData.find(news => news.id === id)
 
+    console.log('handleNewsClick triggered for ID:', id) // Debugging log
+
     // If it's a YouTube video or already has content, just set it as active
     if (!selectedNews || selectedNews.fullContent || selectedNews.videoId) {
       setActiveId(id)
