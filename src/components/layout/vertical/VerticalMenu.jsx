@@ -32,46 +32,70 @@ const VerticalMenu = ({ scrollMenu }) => {
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
 
   // Fetch JSON feed
+  const fetchFeedSources = async () => {
+    try {
+      const response = await axios.get('https://api2.qubicweb.com/v2/feed')
+
+      console.log('API Response:', response.data)
+
+      const feedItems = Array.isArray(response.data.items) ? response.data.items : [] // Ensure array
+
+      // console.log('Fetched News Items:', feedItems)
+
+      const feedsMap = new Map()
+
+      feedItems.forEach(item => {
+        if (!item.source) return // Skip if source is missing
+
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com'
+
+        const title = item.source
+        const slug = generateSlug(title)
+        const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico`
+
+        // Generate dynamic source URL
+        const sourceUrl = `${baseUrl}/${slug}`
+
+        if (!feedsMap.has(title)) {
+          feedsMap.set(title, { name: title, slug, favicon, sourceUrl })
+        }
+      })
+
+      const feeds = Array.from(feedsMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+
+      setFeedSources(feeds)
+
+      // Store the data in localStorage with the current timestamp
+      localStorage.setItem('feedSources', JSON.stringify({ data: feeds, timestamp: new Date().toISOString() }))
+    } catch (error) {
+      console.error('Error fetching feed sources:', error)
+      setFeedSources([]) // Ensure state is an array
+    }
+  }
+
   useEffect(() => {
-    const fetchFeedSources = async () => {
-      try {
-        const response = await axios.get('https://api2.qubicweb.com/v2/feed')
+    const now = new Date()
+    const cachedData = JSON.parse(localStorage.getItem('feedSources'))
+    const cachedTime = cachedData ? new Date(cachedData.timestamp) : null
+    const nigeriaTime = now.toLocaleString('en-US', { timeZone: 'Africa/Lagos' })
+    const currentHour = new Date(nigeriaTime).getHours()
+    const currentMinute = new Date(nigeriaTime).getMinutes()
 
-        console.log('API Response:', response.data)
-
-        const feedItems = Array.isArray(response.data.items) ? response.data.items : [] // Ensure array
-
-        console.log('Fetched News Items:', feedItems)
-
-        const feedsMap = new Map()
-
-        feedItems.forEach(item => {
-          if (!item.source) return // Skip if source is missing
-
-          const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com'
-
-          const title = item.source
-          const slug = generateSlug(title)
-          const favicon = item.favicon || `https://icons.duckduckgo.com/ip3/${slug}.com.ico`
-
-          // Generate dynamic source URL
-          const sourceUrl = `${baseUrl}/${slug}`
-
-          if (!feedsMap.has(title)) {
-            feedsMap.set(title, { name: title, slug, favicon, sourceUrl })
-          }
-        })
-
-        const feeds = Array.from(feedsMap.values()).sort((a, b) => a.name.localeCompare(b.name))
-
-        setFeedSources(feeds)
-      } catch (error) {
-        console.error('Error fetching feed sources:', error)
-        setFeedSources([]) // Ensure state is an array
-      }
+    if (!cachedData || (cachedTime && new Date() - cachedTime > 24 * 60 * 60 * 1000)) {
+      // If cache is expired or doesn't exist, fetch the data
+      fetchFeedSources()
     }
 
-    fetchFeedSources()
+    // Only update the cache at 2:30 AM Nigerian time
+    if (currentHour === 2 && currentMinute === 30) {
+      fetchFeedSources()
+    } else if (cachedData && cachedData.data) {
+      setFeedSources(cachedData.data)
+
+      // const parsedData = JSON.parse(cachedData)
+
+      // console.log('Found cached data:', cachedData)
+    }
   }, [])
 
   const handleMenuClick = (slug, name, sourceUrl) => {

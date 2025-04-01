@@ -165,7 +165,7 @@ body {
 }
 
 .zedindex {
-  z-index: 20 !important;
+  /* z-index: 20 !important; */
 }
 
 .ts-active {
