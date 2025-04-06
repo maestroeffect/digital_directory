@@ -10,6 +10,8 @@ import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
 
+import { v4 as uuidv4 } from 'uuid' // Import UUID generator
+
 import PerfectScrollbarWrapper from './PerfectScrollbar'
 
 import qubicwebgifwhite from '@assets/img/logo_white.gif'
@@ -26,37 +28,81 @@ const NewsList = ({ loading, onScroll }) => {
 
   const searchParams = useSearchParams()
   const [sourceUrl, setSourceUrl] = useState(null)
+  const [bookmarked, setBookmarked] = useState(new Set())
+  const sourceUrlParam = searchParams.get('sourceUrl')
+  const queryNewsId = searchParams.get('newsId')
+
+  // Save bookmarked state to localStorage whenever it changes
+  useEffect(() => {
+    window.localStorage.setItem('bookmarkedNews', JSON.stringify([...bookmarked]))
+  }, [bookmarked])
 
   useEffect(() => {
-    const sourceUrlParam = searchParams.get('sourceUrl')
+    const savedBookmarks = JSON.parse(window.localStorage.getItem('bookmarkedNews')) || []
 
+    setBookmarked(new Set(savedBookmarks))
+
+    if (
+      status === 'authenticated' &&
+      session?.user?.id &&
+      newsData.length > 0 &&
+      typeof newsData[0]?.source === 'string'
+    ) {
+      fetchBookmarkedNews(newsData[0].source)
+    }
+  }, [status, session, newsData, sourceUrl])
+
+  useEffect(() => {
     if (sourceUrlParam) {
       setSourceUrl(sourceUrlParam)
       setNewsData([]) // ✅ Clear the old news list
+
+      if (queryNewsId && newsData.length > 0) {
+        const numericId = parseInt(queryNewsId)
+
+        if (!isNaN(numericId)) {
+          handleNewsClick(numericId)
+        }
+      }
+
       setActiveId(null) // ✅ Reset active news when the source changes
     }
   }, [searchParams])
 
-  const [bookmarked, setBookmarked] = useState(new Set())
-
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.id && newsData.length > 0) {
       // Check if the current news is bookmarked
-      fetchBookmarkedNews(newsData) // Pass the entire list of news to check
+      fetchBookmarkedNews(newsData[0].source) // Pass the source
     }
   }, [status, session, newsData])
   useEffect(() => {
     if (newsData.length > 0 && newsData[0]?.source && typeof newsData[0].source === 'string') {
-      setBookmarked(new Set()) // Clear previous bookmarks
+      // setBookmarked(new Set()) // Clear previous bookmarks
       fetchBookmarkedNews(newsData[0].source) // Fetch bookmarks for the new
       // ✅ Reset activeId ONLY when the source actually changes
       setActiveId(prevId => (newsData.some(news => news.id === prevId) ? prevId : null))
     }
   }, [newsData])
 
+  useEffect(() => {
+    if (status === 'unauthenticated' && !sessionStorage.getItem('bookmark_warned')) {
+      // Show a notification ring (Toast, can be modified to a modal or floating notification)
+      toast.info('🔔 You have to login to bookmark.', { autoClose: 4000 })
+
+      // Prevent showing the toast again in the current session
+      sessionStorage.setItem('bookmark_warned', 'true')
+    }
+  }, [status])
+
   const fetchBookmarkedNews = async selectedSource => {
+    if (status !== 'authenticated' || !session?.user?.id) {
+      console.warn('User is not logged in. Skipping bookmark fetch.')
+
+      return
+    }
+
     if (!selectedSource || typeof selectedSource !== 'string') {
-      // console.error('Invalid source provided for bookmarks:', selectedSource)
+      console.error('Invalid source provided for bookmarks:', selectedSource)
 
       return
     }
@@ -68,10 +114,17 @@ const NewsList = ({ loading, onScroll }) => {
 
       const data = await response.json()
 
+      // console.log('Fetched Bookmarks:', data.bookmarks)
+
       // Only store bookmarks that belong to the selected source
-      const filteredBookmarks = new Set(data.bookmarks.map(bookmark => bookmark.news.id))
+      const filteredBookmarks = new Set([...data.bookmarks.map(bookmark => bookmark.newsId)])
+
+      // console.log('Matched Data:', filteredBookmarks)
 
       setBookmarked(filteredBookmarks)
+
+      // ✅ Save fetched bookmarks to localStorage
+      window.localStorage.setItem('bookmarkedNews', JSON.stringify([...filteredBookmarks]))
     } catch (error) {
       console.error('Error fetching bookmarks:', error)
     }
@@ -79,11 +132,14 @@ const NewsList = ({ loading, onScroll }) => {
 
   const toggleBookmark = async newsItem => {
     // console.log(sourceUrl)
-
     console.log('News Item in Bookmark:', newsItem)
+    console.log('Fetching bookmarks for news ID:', newsItem.id)
+    console.log('Bookmarking news:', newsItem.title)
+    console.log(sourceUrl)
 
-    if (!newsItem.id || !newsItem.title || !newsItem.source) {
-      toast.error('Invalid news data.')
+    // Validate required fields
+    if (!newsItem.id || !newsItem.title || !newsItem.source || !sourceUrl) {
+      toast.error('Invalid or missing news data.')
 
       return
     }
@@ -106,15 +162,36 @@ const NewsList = ({ loading, onScroll }) => {
 
       isBookmarked ? updated.delete(newsItem.id) : updated.add(newsItem.id)
 
+      // ✅ Persist changes to localStorage
+      window.localStorage.setItem('bookmarkedNews', JSON.stringify([...updated]))
+
       return updated
     })
 
     try {
+      // console.log('About to enter:', newsItem.id)
+      // In your API handler
+      const newsUuid = uuidv4() // Generate a new UUID for the news item
+
+      console.log('Request Body:', {
+        newsId: newsItem.id,
+        newsUuid,
+        title: newsItem.title,
+        content: newsItem.contentSnippet || 'No content available.',
+        source: newsItem.source,
+
+        // sourceId:
+        newsUrl: newsItem.link,
+        sourceUrl,
+        publishedAt: newsItem.publishedDate || new Date().toISOString()
+      })
+
       const response = await fetch('/api/auth/bookmarks', {
         method: isBookmarked ? 'DELETE' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           newsId: newsItem.id,
+          newsUuid,
           title: newsItem.title,
           content: newsItem.contentSnippet || 'No content available.',
           source: newsItem.source,
@@ -175,7 +252,7 @@ const NewsList = ({ loading, onScroll }) => {
               <div className='flex justify-between pl-10'>
                 <div className='flex-1'>
                   <h3
-                    className={`text-sm font-semibold ${settings.mode === 'dark' ? 'text-white-800' : 'text-gray-800'}`}
+                    className={`text-sm font-semibold ${settings.mode === 'dark' ? 'text-white hover:text-orange-500' : 'text-gray-800'}`}
                   >
                     {news.title}
                   </h3>
@@ -193,10 +270,12 @@ const NewsList = ({ loading, onScroll }) => {
                   <div
                     onClick={e => {
                       e.stopPropagation()
-                      toggleBookmark(news, sourceUrl)
+                      toggleBookmark(news)
                     }}
                     className='text-orange-500 hover:text-gray-500 cursor-pointer opacity-1 group-hover:opacity-100 transition-opacity'
                   >
+                    {/* Ensure the icon activates based on bookmark state */}
+                    {/* {console.log('Hiinews,', news.id)} */}
                     {bookmarked.has(news.id) ? <Bookmark fontSize='medium' /> : <BookmarkBorder fontSize='medium' />}
                   </div>
                 )}
@@ -220,20 +299,6 @@ const NewsList = ({ loading, onScroll }) => {
             </div>
           </div>
         )}
-
-        {/* "Select a News Feed" Message */}
-        {/* {!loading && !activeId && (
-          <div
-            className={`p-3 text-center flex flex-col items-center mt-3 {settings.mode === 'dark' ? 'bg-dark border border-orange-300' : 'border-gray-300 border'} text-gray-500`}
-          >
-            <img
-              src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
-              className='w-[50px] h-[50px]'
-              alt='Select a News Feed'
-            />
-            <span className='text-lg font-semibold'>Select a News Feed</span>
-          </div>
-        )} */}
 
         {/* "No More Content" Message */}
         {!loading && !activeId && newsData.length > 0 && (

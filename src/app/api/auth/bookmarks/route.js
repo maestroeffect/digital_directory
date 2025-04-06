@@ -2,84 +2,82 @@ import { NextResponse } from 'next/server'
 
 import { getServerSession } from 'next-auth'
 
+import { v4 as uuidv4 } from 'uuid' // Import UUID generator
+
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 // Handle POST request to save a bookmark
 export async function POST(req) {
-  // try {
-  //   const body = await req.json() // Await req.json() once
-  //   console.log('📩 Incoming Request Data:', body) // Log the full request body
-
-  //   return NextResponse.json({ message: 'Check your server logs for the request body.' })
-  // } catch (error) {
-  //   console.error('❌ Error reading request JSON:', error)
-  //   return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
-  // }
   const session = await getServerSession(authOptions)
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { newsId, title, content, source, newsUrl, sourceUrl, publishedAt } = await req.json()
+  const { newsUuid, newsId, title, content, source, newsUrl, sourceUrl, publishedAt } = await req.json()
 
-  if (
-    newsId === null ||
-    newsId === undefined ||
-    !title ||
-    !content ||
-    !newsUrl ||
-    !sourceUrl ||
-    !source ||
-    !publishedAt
-  ) {
+  if (!newsUuid || !newsId || !title || !content || !newsUrl || !sourceUrl || !source || !publishedAt) {
     return NextResponse.json({ error: 'Missing news data' }, { status: 400 })
   }
 
   try {
     const userId = parseInt(session.user.id, 10)
 
-    // 🔹 Find or create the source
-    let sourceRecord = await db.source.findUnique({
-      where: { name: source }
-    })
+    const user = await db.user.findUnique({ where: { id: userId } })
 
-    if (!sourceRecord) {
-      sourceRecord = await db.source.create({
-        data: { name: source, sourceUrl: sourceUrl }
-      })
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // 🔹 Find or create the news item in the specific source
-    let news = await db.news.findFirst({
+    const sourceRecord = await db.source.upsert({
+      where: { name: source },
+      update: {},
+      create: { name: source, sourceUrl }
+    })
+
+    // Ensure the news entry is unique per source
+    let news = await db.news.upsert({
       where: {
+        newsId_sourceId: {
+          newsId: newsId, // Ensure uniqueness with source
+          sourceId: sourceRecord.id
+        }
+      },
+      update: {
         title,
-        sourceId: sourceRecord.id // Ensure news is unique per source
+        content,
+        url: newsUrl,
+        publishedAt: new Date(publishedAt)
+      },
+      create: {
+        newsId,
+        uuid: newsUuid,
+        title,
+        content,
+        url: newsUrl,
+        sourceId: sourceRecord.id,
+        publishedAt: new Date(publishedAt)
       }
     })
 
-    if (!news) {
-      news = await db.news.create({
-        data: {
-          title,
-          content,
-          url: newsUrl,
-          sourceId: sourceRecord.id,
-          publishedAt: new Date(publishedAt)
-        }
-      })
+    const existingBookmark = await db.bookmark.findFirst({
+      where: {
+        userId,
+        newsId: newsId,
+        sourceId: news.sourceId
+      }
+    })
+
+    if (existingBookmark) {
+      return NextResponse.json({ message: 'Bookmark already exists' }, { status: 200 })
     }
 
-    console.log('📰 News Found/Created:', news.id)
-
-    // Save bookmark
     await db.bookmark.create({
       data: {
         userId,
-        newsId: news.id,
-        sourceId: news.sourceId // use sourceId here
-        // user: { connect: { id: userId } } // Connecting the user with the bookmark
+        newsId: newsId,
+        sourceId: news.sourceId
       }
     })
 
@@ -87,7 +85,7 @@ export async function POST(req) {
   } catch (error) {
     console.error('❌ Bookmark API Error:', error.message)
 
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 })
   }
 }
 
@@ -100,34 +98,53 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { newsId } = await req.json()
+    const { newsId, source } = await req.json()
 
-    if (!newsId) {
-      return NextResponse.json({ error: 'News ID is required' }, { status: 400 })
+    if (!newsId || !source) {
+      return NextResponse.json({ error: 'Missing newsId or source' }, { status: 400 })
     }
 
     const userId = parseInt(session.user.id, 10)
 
     if (isNaN(userId)) {
-      console.error('❌ Invalid User ID:', session.user.id)
-
       return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 })
     }
 
-    console.log('🗑 Deleting Bookmark:', { userId, newsId })
+    // Find the source by name
+    const sourceRecord = await db.source.findUnique({
+      where: { name: source }
+    })
 
-    await db.bookmark.deleteMany({
+    if (!sourceRecord) {
+      return NextResponse.json({ error: 'Source not found' }, { status: 404 })
+    }
+
+    // Find the news by newsId and sourceId (composite unique constraint)
+    const news = await db.news.findUnique({
       where: {
-        userId,
-        newsId
+        newsId_sourceId: {
+          newsId,
+          sourceId: sourceRecord.id
+        }
       }
     })
 
-    console.log('✅ Bookmark deleted successfully')
+    if (!news) {
+      return NextResponse.json({ error: 'News not found for this source' }, { status: 404 })
+    }
+
+    // Delete the bookmark
+    await db.bookmark.deleteMany({
+      where: {
+        userId,
+        newsId,
+        sourceId: sourceRecord.id
+      }
+    })
 
     return NextResponse.json({ message: 'Bookmark removed' }, { status: 200 })
   } catch (error) {
-    console.error('❌ Bookmark API Error:', error)
+    console.error('❌ Bookmark DELETE Error:', error)
 
     return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 })
   }
@@ -179,7 +196,17 @@ export async function GET(req) {
         sourceId: sourceRecord.id
       },
       include: {
-        news: true // Fetch related news data
+        news: {
+          select: {
+            uuid: true,
+            title: true,
+            content: true,
+            url: true,
+            publishedAt: true
+
+            // Add anything else needed
+          }
+        }
       }
     })
 

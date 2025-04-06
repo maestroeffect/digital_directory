@@ -6,6 +6,8 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import axios from 'axios'
 
+import { hover } from 'motion'
+
 import { Menu, MenuItem } from '@menu/vertical-menu'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
@@ -27,6 +29,7 @@ const VerticalMenu = ({ scrollMenu }) => {
   const [feedSources, setFeedSources] = useState([])
   const router = useRouter()
   const pathname = usePathname() // ✅ Get the current pathname
+  const [hoveredIndex, setHoveredIndex] = useState(null)
 
   // Function to generate slugs from source names
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
@@ -124,6 +127,7 @@ const VerticalMenu = ({ scrollMenu }) => {
       >
         {feedSources.map((feed, index) => {
           const isActive = pathname === `/${feed.slug}` // ✅ Check if active
+          const isHovered = hoveredIndex === index
 
           return (
             <MenuItem
@@ -133,9 +137,9 @@ const VerticalMenu = ({ scrollMenu }) => {
               style={{
                 position: 'relative',
                 cursor: 'pointer',
-                color: theme.palette.mode === 'dark' ? '#fff' : 'inherit',
+                color: theme.palette.mode === 'dark' ? '#fff' : 'black',
                 fontWeight: isActive ? 'bold' : 'normal', // ✅ Highlight active link
-                backgroundColor: isActive ? '#F97316' : 'transparent', // ✅ Active bg color
+                backgroundColor: isActive ? '#F97316' : isHovered ? 'pink' : 'transparent',
                 borderRadius: '8px' // Optional: Smooth highlight
               }}
               onClick={() => handleMenuClick(feed.slug, feed.name, feed.sourceUrl)}

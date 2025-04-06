@@ -17,11 +17,12 @@ import { useNews } from '@/context/NewsContext'
 
 const Bookmarks = ({ onScroll }) => {
   const { data: session, status } = useSession()
-  const { handleNewsClick, setActiveId } = useNews()
+  const { handleNewsClick, setActiveId, setNewsData } = useNews()
   const [bookmarks, setBookmarks] = useState({})
   const [sourcesMap, setSourcesMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [images, setImages] = useState({})
+  const [loadingArticle, setLoadingArticle] = useState(false)
 
   // const { router } = useRouter()
   const router = useRouter()
@@ -137,18 +138,21 @@ const Bookmarks = ({ onScroll }) => {
   const handleSourceAndNewsClick = (newsId, sourceName) => {
     // First, set the active news item
     // console.log('Hiiis')
-
-    setActiveId(newsId)
+    setLoadingArticle(true) // Set loading state to true when a bookmark is clicked
+    setNewsData([]) // ✅ Clear the old news list
 
     // Then, navigate to the source page, potentially showing the full news list
     if (sourcesMap[sourceName]) {
       // window.location.href = sourcesMap[sourceName]
       console.log(sourcesMap[sourceName])
 
-      router.push(sourcesMap[sourceName])
+      router.push(`${sourcesMap[sourceName]}?newsId=${newsId}?sourceUrl=`)
+      setActiveId(newsId)
     } else {
       console.error('Source URL not found')
     }
+
+    setLoadingArticle(false) // Set loading state to false once content is loaded
   }
 
   if (status === 'loading' || loading)
@@ -188,7 +192,7 @@ const Bookmarks = ({ onScroll }) => {
                       onClick={e => {
                         console.log('Just got clicked')
                         e.preventDefault() // Prevent the default link behavior
-                        handleSourceAndNewsClick(bookmark.news.id, source) // Call the new function to handle news click
+                        handleSourceAndNewsClick(bookmark.newsId, source) // Call the new function to handle news click
                       }}
                       rel='noopener noreferrer'
                       className={`${settings.mode === 'dark' ? 'text-white' : ''} cursor-pointer hover:text-orange-500 transition`}

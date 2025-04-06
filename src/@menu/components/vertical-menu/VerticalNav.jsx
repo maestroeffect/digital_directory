@@ -19,6 +19,8 @@ import StyledVerticalNav from '../../styles/vertical/StyledVerticalNav'
 import StyledVerticalNavContainer from '../../styles/vertical/StyledVerticalNavContainer'
 import StyledVerticalNavBgColorContainer from '../../styles/vertical/StyledVerticalNavBgColorContainer'
 
+import { useSettings } from '@/@core/hooks/useSettings'
+
 // Style Imports
 import styles from '../../styles/vertical/verticalNavBgImage.module.css'
 
@@ -31,7 +33,7 @@ const VerticalNav = props => {
     width = 260,
     collapsedWidth = 80,
     defaultCollapsed = false,
-    backgroundColor = 'white',
+    backgroundColor = '#fff !important',
     backgroundImage,
     breakpoint = 'lg',
     customBreakpoint,
@@ -50,6 +52,8 @@ const VerticalNav = props => {
 
   // Refs
   const verticalNavCollapsedRef = useRef(false)
+
+  const { settings } = useSettings()
 
   // Hooks
   const {
@@ -179,7 +183,7 @@ const VerticalNav = props => {
         {/* VerticalNav Container to apply styling like background */}
         <StyledVerticalNavBgColorContainer
           className={verticalNavClasses.bgColorContainer}
-          backgroundColor={backgroundColor}
+          backgroundColor={`${settings.mode === 'dark' ? '#000' : '#fff'}`}
         >
           {children}
         </StyledVerticalNavBgColorContainer>

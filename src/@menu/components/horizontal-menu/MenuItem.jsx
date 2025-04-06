@@ -33,6 +33,7 @@ import StyledHorizontalMenuItem from '../../styles/horizontal/StyledHorizontalMe
 
 // Style Imports
 import styles from '../../styles/horizontal/horizontalUl.module.css'
+import { useSettings } from '@/@core/hooks/useSettings'
 
 const MenuItem = (props, ref) => {
   // Props
@@ -61,6 +62,8 @@ const MenuItem = (props, ref) => {
   const { toggleVerticalNav, isToggled } = useVerticalNav()
   const { getItemProps } = useContext(HorizontalSubMenuContext)
   const { menuItemStyles, renderExpandedMenuItemIcon, textTruncate } = useHorizontalMenu()
+
+  const { settings } = useSettings()
 
   const getMenuItemStyles = element => {
     // If the menuItemStyles prop is provided, get the styles for the specified element.
@@ -158,7 +161,7 @@ const MenuItem = (props, ref) => {
 
         {/* Menu Item Label */}
         <StyledMenuLabel
-          className={menuClasses.label}
+          className={menuClasses.label`${settings.mode === 'dark' ? 'text-[#fff]' : 'text-[#000]'}`}
           rootStyles={getMenuItemStyles('label')}
           textTruncate={textTruncate}
         >

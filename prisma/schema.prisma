@@ -42,34 +42,37 @@ model Source {
   news      News[]
   bookmarks Bookmark[] // ✅ Add this to establish the relation
 }
-
 model News {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement()) // Internal ID
+  newsId      Int
+  uuid        String     @unique @default(uuid())
   title       String
   content     String
-  url         String   // Add this line
+  url         String
   sourceId    Int
   publishedAt DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  source    Source     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  bookmarks Bookmark[]
+  source    Source       @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  bookmarks Bookmark[]   // A news item can be bookmarked by many users
+
+  @@unique([newsId, sourceId]) // ✅ Ensuring uniqueness
 }
 
 model Bookmark {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   userId    Int
   newsId    Int
   sourceId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id])
-  news   News   @relation(fields: [newsId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+ user   User   @relation(fields: [userId], references: [id])
+  news   News   @relation(fields: [newsId, sourceId], references: [newsId, sourceId]) // Reference composite key
   source Source @relation(fields: [sourceId], references: [id])
 
-@@unique([userId, sourceId, newsId]) // Ensures uniqueness within each source
-
-  @@index([userId, sourceId]) // Index for quick lookups
+  @@unique([userId, newsId, sourceId]) // ✅ Composite unique constraint for Bookmarks
 }

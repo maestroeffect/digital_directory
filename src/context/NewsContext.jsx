@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
 import Mercury from '@postlight/mercury-parser'
+import { toast } from 'react-toastify'
 
 const NewsContext = createContext()
 
@@ -33,19 +34,30 @@ export const NewsProvider = ({ children }) => {
   }
 
   const fetchNews = async () => {
-    if (!source) return
+    // if (!source) return
     setLoading(true)
 
     try {
+      // Check if the user is offline before trying to fetch
+      if (!navigator.onLine) {
+        throw new Error('No internet connection.')
+      }
+
       const response = await fetch('https://api2.qubicweb.com/v2/feed', {
         next: { revalidate: 10 }
       })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
       const filteredItems = items
-        .filter(item => item.source && generateSlug(item.source) === source)
+
+        // .filter(item => item.source && generateSlug(item.source) === source)
+        .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
         .map((item, index) => {
           const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
 
@@ -68,6 +80,15 @@ export const NewsProvider = ({ children }) => {
       setNewsData(filteredItems)
     } catch (error) {
       console.error('Error fetching news:', error)
+
+      if (error.message === 'No internet connection.') {
+        toast.error('❌ No internet connection. Please check your network.')
+      } else if (error.message.includes('HTTP error! status: 404')) {
+        toast.error('❌ News not found (404). Please try again later.')
+      } else {
+        toast.error('❌ An unexpected error occurred. Please Refresh.')
+      }
+
       setNewsData([])
     } finally {
       setLoading(false)
@@ -110,6 +131,7 @@ export const NewsProvider = ({ children }) => {
   }
 
   const handleNewsClick = async id => {
+    setLoadingArticle(true)
     const selectedNews = newsData.find(news => news.id === id)
 
     console.log('handleNewsClick triggered for ID:', id) // Debugging log
@@ -129,6 +151,7 @@ export const NewsProvider = ({ children }) => {
         news.id === id ? { ...news, fullContent, image: mainImage || news.image, additionalImages: images } : news
       )
     )
+    setLoadingArticle(false)
   }
 
   return (

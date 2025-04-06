@@ -121,7 +121,7 @@ const UserDropdown = () => {
                   </div>
                   <Divider className='mlb-1' />
                   <MenuItem
-                    className={`gap-3 pli-4 mx-3 ${pathname === '/my-bookmarks' ? 'bg-black rounded-lg text-white' : ''}`}
+                    className={`gap-3 pli-4 mx-3 ${pathname === '/my-bookmarks' ? 'bg-gray-100 rounded-lg text-white' : ''}`}
                     onClick={handleBookmarkClick}
                   >
                     <i className={`ri-bookmark-2-fill `} />

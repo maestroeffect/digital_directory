@@ -27,7 +27,9 @@ const NewsReader = () => {
     return (
       <div className='p-8 flex flex-col items-center'>
         <img src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src} className='w-[30%] h-[30%]' />
-        <p className={`text-center border p-2 ${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'} mt-4`}>
+        <p
+          className={`text-center border p-2 ${settings.mode === 'dark' ? 'text-white border-white' : 'text-gray-500'} mt-4`}
+        >
           Select a news item to view its details.
         </p>
       </div>
@@ -47,7 +49,7 @@ const NewsReader = () => {
         </div>
       ) : (
         <div style={{ fontSize: `${fontSize}px` }}>
-          <h1 className={`text-2xl font-bold ${settings.mode === 'dark' ? 'text-white-800' : 'text-gray-800'} mb-2`}>
+          <h1 className={`text-2xl font-bold ${settings.mode === 'dark' ? 'text-white' : 'text-gray-800'} mb-2`}>
             {activeNews.title}
           </h1>
 
@@ -71,7 +73,7 @@ const NewsReader = () => {
               </>
             ) : (
               <div
-                className={`${settings.mode === 'dark' ? 'text-white-700' : 'text-gray-700'}`}
+                className={`${settings.mode === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 dangerouslySetInnerHTML={{ __html: activeNews.fullContent || 'Content not available' }}
               />
             )}

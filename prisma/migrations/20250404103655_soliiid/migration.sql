@@ -40,6 +40,8 @@ CREATE TABLE `Source` (
 -- CreateTable
 CREATE TABLE `News` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `newsId` INTEGER NOT NULL,
+    `uuid` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `content` VARCHAR(191) NOT NULL,
     `url` VARCHAR(191) NOT NULL,
@@ -48,20 +50,24 @@ CREATE TABLE `News` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    UNIQUE INDEX `News_newsId_key`(`newsId`),
+    UNIQUE INDEX `News_uuid_key`(`uuid`),
+    UNIQUE INDEX `News_newsId_sourceId_key`(`newsId`, `sourceId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Bookmark` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `uuid` VARCHAR(191) NOT NULL,
     `userId` INTEGER NOT NULL,
     `newsId` INTEGER NOT NULL,
     `sourceId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    INDEX `Bookmark_userId_sourceId_idx`(`userId`, `sourceId`),
-    UNIQUE INDEX `Bookmark_userId_sourceId_newsId_key`(`userId`, `sourceId`, `newsId`),
+    UNIQUE INDEX `Bookmark_uuid_key`(`uuid`),
+    UNIQUE INDEX `Bookmark_userId_newsId_sourceId_key`(`userId`, `newsId`, `sourceId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -75,7 +81,7 @@ ALTER TABLE `News` ADD CONSTRAINT `News_sourceId_fkey` FOREIGN KEY (`sourceId`) 
 ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_newsId_fkey` FOREIGN KEY (`newsId`) REFERENCES `News`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_newsId_fkey` FOREIGN KEY (`newsId`) REFERENCES `News`(`newsId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_sourceId_fkey` FOREIGN KEY (`sourceId`) REFERENCES `Source`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
