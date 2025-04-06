@@ -22,6 +22,23 @@ export const NewsProvider = ({ children }) => {
   const params = useParams()
   const source = params.slug
 
+  useEffect(() => {
+    const handleOnline = () => {
+      toast.success('✅ You are back online!')
+    }
+
+    const handleOffline = () => {
+      toast.error('❌ You are offline. Please check your connection.')
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
 
   // Function to detect YouTube links and extract video ID
