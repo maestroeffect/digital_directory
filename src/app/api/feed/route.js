@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const apiUrl = 'https://api.qubicweb.com/v1/feed'
+  const apiUrl = 'https://api.qubicweb.com:8082/v1/feed'
 
   try {
     const response = await fetch(apiUrl)

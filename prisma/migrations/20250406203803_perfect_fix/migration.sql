@@ -50,7 +50,6 @@ CREATE TABLE `News` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `News_newsId_key`(`newsId`),
     UNIQUE INDEX `News_uuid_key`(`uuid`),
     UNIQUE INDEX `News_newsId_sourceId_key`(`newsId`, `sourceId`),
     PRIMARY KEY (`id`)
@@ -81,7 +80,7 @@ ALTER TABLE `News` ADD CONSTRAINT `News_sourceId_fkey` FOREIGN KEY (`sourceId`) 
 ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_newsId_fkey` FOREIGN KEY (`newsId`) REFERENCES `News`(`newsId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_newsId_sourceId_fkey` FOREIGN KEY (`newsId`, `sourceId`) REFERENCES `News`(`newsId`, `sourceId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Bookmark` ADD CONSTRAINT `Bookmark_sourceId_fkey` FOREIGN KEY (`sourceId`) REFERENCES `Source`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
