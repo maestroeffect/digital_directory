@@ -60,7 +60,7 @@ export const NewsProvider = ({ children }) => {
         throw new Error('No internet connection.')
       }
 
-      const response = await fetch('https://api2.qubicweb.com/v2/feed', {
+      const response = await fetch('https://api2.qubicweb.com:8082/v2/feed', {
         next: { revalidate: 10 }
       })
 

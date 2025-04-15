@@ -37,7 +37,7 @@ const VerticalMenu = ({ scrollMenu }) => {
   // Fetch JSON feed
   const fetchFeedSources = async () => {
     try {
-      const response = await axios.get('https://api2.qubicweb.com/v2/feed')
+      const response = await axios.get('https://api2.qubicweb.com:8082/v2/feed')
 
       console.log('API Response:', response.data)
 
