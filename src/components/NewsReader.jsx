@@ -20,7 +20,7 @@ import { useSettings } from '@core/hooks/useSettings'
 // import PerfectScrollbarWrapper from './PerfectScrollbar'
 
 const NewsReader = () => {
-  const { newsData, activeId, loadingArticle, fontSize } = useNews()
+  const { newsData, activeId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
   const activeNews = newsData.find(news => news.id === activeId)
 
@@ -31,8 +31,8 @@ const NewsReader = () => {
   // Auto-retry logic when content fails
   useEffect(() => {
     if (!loadingArticle && activeId && (!activeNews || !activeNews.fullContent)) {
-      const toastId = toast.warn('❌ Failed to fetch news. Kindly wait, refreshing in 5 secs...', {
-        autoClose: false
+      const toastId = toast.warn('❌ Failed to fetch news. Kindly Reclick or wait, refreshing in 5 secs...', {
+        autoClose: 5000
       })
 
       setRetrying(true)
@@ -40,7 +40,7 @@ const NewsReader = () => {
       const timer = setTimeout(() => {
         toast.update(toastId, {
           render: '🔄 Retrying now...',
-          type: toast.TYPE.INFO,
+          type: 'info',
           autoClose: 2000
         })
 
