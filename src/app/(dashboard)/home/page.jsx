@@ -8,6 +8,10 @@ import { Divider } from '@mui/material'
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
+import qubicwebgif from '@assets/img/logo.gif'
+
+import qubicwebgifwhite from '@assets/img/logo_white.gif'
+
 import FeedLayout from '@/components/layout/vertical/FeedLayout'
 import NewsList from '@/components/NewsList'
 import { useNews } from '@/context/NewsContext'
@@ -82,7 +86,14 @@ const Home = () => {
 
   return (
     <div className='flex flex-col items-center justify-center p-4 space-y-6'>
-      <h1 className={`text-3xl ${settings.mode === 'dark' ? 'text-white' : ''} font-bold`}>📊 Digital Directory</h1>
+      <h1 className={`flex items-center gap-2 text-3xl font-bold ${settings.mode === 'dark' ? 'text-white' : ''}`}>
+        <img
+          src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+          alt='QubicWeb Logo'
+          className='w-20 h-20'
+        />
+        Digital Directory
+      </h1>
 
       {/* Analytics Cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
@@ -159,7 +170,7 @@ const Home = () => {
                       >
                         {news.title}
                       </a>
-                      <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p>
+                      {/* <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p> */}
                     </div>
                   ))}
               </div>
