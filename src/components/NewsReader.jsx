@@ -26,6 +26,7 @@ const NewsReader = () => {
 
   // Settings hook
   const { settings } = useSettings()
+  const [retrying, setRetrying] = useState(false)
 
   // Auto-retry logic when content fails
   useEffect(() => {
