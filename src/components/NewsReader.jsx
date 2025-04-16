@@ -1,6 +1,6 @@
 // components/NewsReader.js\
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Divider } from '@mui/material'
 
