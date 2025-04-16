@@ -227,10 +227,10 @@ const NewsList = ({ loading, onScroll }) => {
             <div
               key={news.id}
               onClick={() => handleNewsClick(news.id)}
-              className={`p-3 border rounded-lg relative cursor-pointer hover:${settings.mode === 'dark' ? 'bg-gray-100 hover:text-[#F97316]' : 'bg-gray-100'}
+              className={`p-3 border rounded-lg relative cursor-pointer ${settings.mode === 'dark' ? 'hover:bg-[#fff]' : 'bg-transparent hover:bg-black'}
               ${
                 settings.mode === 'dark' && news.id === activeId
-                  ? 'bg-orange-100 border-orange-500 text-[#000]'
+                  ? 'border-orange-500 text-[#000]'
                   : settings.mode === 'light' && news.id === activeId
                     ? 'bg-orange-100 border-orange-500'
                     : 'bg-dark border-gray-300'
@@ -238,7 +238,7 @@ const NewsList = ({ loading, onScroll }) => {
             >
               {/* ID Badge */}
               <div
-                className={`absolute top-4 left-3 ${settings.mode === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} font-bold text-sm flex items-center justify-center`}
+                className={`absolute top-4 left-3 ${settings.mode === 'dark' ? 'bg-white text-black group-hover:bg-black group-hover:text-white' : 'bg-black text-white group-hover:bg-white group-hover:text-black'} font-bold text-sm flex items-center justify-center`}
                 style={{
                   width: '32px', // Adjust size as needed
                   height: '28px',
@@ -252,12 +252,12 @@ const NewsList = ({ loading, onScroll }) => {
               <div className='flex justify-between pl-10'>
                 <div className='flex-1'>
                   <h3
-                    className={`text-sm font-semibold ${settings.mode === 'dark' ? 'text-white hover:text-orange-500' : 'text-gray-800'}`}
+                    className={`text-sm font-semibold ${settings.mode === 'dark' ? 'text-white group-hover:text-orange-500' : 'text-gray-800 group-hover:text-orange-500'}`}
                   >
                     {news.title}
                   </h3>
                   <div
-                    className={`text-xs ${settings.mode === 'dark' ? 'text-white-500' : 'text-gray-500'} flex space-x-2 mt-1`}
+                    className={`text-xs ${settings.mode === 'dark' ? 'text-white group-hover:text-orange-500' : 'text-gray-500 group-hover:text-orange-500'} flex space-x-2 mt-1`}
                   >
                     <span>{news.source}</span>
                     <span>·</span>

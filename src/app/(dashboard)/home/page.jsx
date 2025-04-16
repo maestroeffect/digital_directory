@@ -82,10 +82,10 @@ const Home = () => {
 
   return (
     <div className='flex flex-col items-center justify-center p-4 space-y-6'>
-      <h1 className={`text-3xl ${settings.mode === 'dark' ? 'text-white' : ''} font-bold`}>📊 Qubicboard Overview</h1>
+      <h1 className={`text-3xl ${settings.mode === 'dark' ? 'text-white' : ''} font-bold`}>📊 Digital Directory</h1>
 
       {/* Analytics Cards */}
-      {/* <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
         <Card
           className={`bg-black ${settings.mode === 'dark' ? 'border border-orange-500 shadow-md' : ''} w-full h-[200px]`}
         >
@@ -131,17 +131,17 @@ const Home = () => {
             </div>
           </CardContent>
         </Card>
-      </div> */}
+      </div>
 
       {/* Latest News Section */}
       <div className='w-full'>
-        {/* <h2 className='text-xl text-center font-semibold mt-6 mb-2'>📰 Latest News</h2> */}
+        <h2 className='text-xl text-center font-semibold mt-6 mb-2'>📰 Latest News</h2>
         {/* Horizontal Line */}
-        {/* <Divider className='border-gray-300 my-3' /> */}
+        <Divider className='border-gray-300 my-3' />
 
         {/* News from Different Sources */}
         {/* Grid layout for 3 columns */}
-        {/* <PerfectScrollbarWrapper onScroll={onScroll}>
+        <PerfectScrollbarWrapper onScroll={onScroll}>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             {Array.from(new Set(newsData.map(news => news.source))).map(source => (
               <div key={source} className='bg-white p-4 rounded-lg shadow-md'>
@@ -158,14 +158,14 @@ const Home = () => {
                         className='text-orange-500 hover:underline font-medium'
                       >
                         {news.title}
-                      </a> */}
-        {/* <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p> */}
-        {/* </div>
+                      </a>
+                      <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p>
+                    </div>
                   ))}
               </div>
             ))}
           </div>
-        </PerfectScrollbarWrapper> */}
+        </PerfectScrollbarWrapper>
       </div>
     </div>
   )

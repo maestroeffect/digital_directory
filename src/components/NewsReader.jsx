@@ -1,8 +1,12 @@
 // components/NewsReader.js\
 
+import { useEffect } from 'react'
+
 import { Divider } from '@mui/material'
 
 import PerfectScrollbar from 'react-perfect-scrollbar'
+
+import { toast } from 'react-toastify'
 
 import { useNews } from '@/context/NewsContext'
 
@@ -22,6 +26,30 @@ const NewsReader = () => {
 
   // Settings hook
   const { settings } = useSettings()
+
+  // Auto-retry logic when content fails
+  useEffect(() => {
+    if (!loadingArticle && activeId && (!activeNews || !activeNews.fullContent)) {
+      const toastId = toast.warn('❌ Failed to fetch news. Kindly wait, refreshing in 5 secs...', {
+        autoClose: false
+      })
+
+      setRetrying(true)
+
+      const timer = setTimeout(() => {
+        toast.update(toastId, {
+          render: '🔄 Retrying now...',
+          type: toast.TYPE.INFO,
+          autoClose: 2000
+        })
+
+        handleNewsClick(activeId) // re-fetch
+        setRetrying(false)
+      }, 5000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [activeNews, activeId, loadingArticle])
 
   if (!activeNews) {
     return (
