@@ -19,12 +19,14 @@ import PerfectScrollbarWrapper from '@/components/PerfectScrollbar'
 import { useSettings } from '@/@core/hooks/useSettings'
 
 const Home = () => {
-  const { newsData, setNewsData, onScroll } = useNews()
+  const { newsData, onScroll } = useNews()
   const [loading, setLoading] = useState(false)
   const [totalNewsCount, setTotalNewsCount] = useState(0)
   const [uniqueSourcesCount, setUniqueSourcesCount] = useState(0)
   const [uniqueCategoriesCount, setUniqueCategoriesCount] = useState(0)
   const [totalCommentsCount, setTotalCommentsCount] = useState(0)
+  const [totalBookmarksCount, setTotalBookmarksCount] = useState(0)
+
   const { settings } = useSettings()
 
   useEffect(() => {
@@ -82,6 +84,25 @@ const Home = () => {
     }
   }, [newsData])
 
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const response = await fetch('/api/auth/bookmarks?source=all')
+        const data = await response.json()
+
+        if (response.ok) {
+          setTotalBookmarksCount(data.bookmarks.length)
+        } else {
+          console.error('Failed to fetch bookmarks:', data.error)
+        }
+      } catch (error) {
+        console.error('Error fetching bookmarks:', error)
+      }
+    }
+
+    fetchBookmarks()
+  }, [])
+
   const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
 
   return (
@@ -115,8 +136,10 @@ const Home = () => {
           <CardContent className='flex items-center gap-4 py-6'>
             <Users className='w-12 h-12 text-green-600' />
             <div>
-              <p className='text-lg text-gray-600'>Sources</p>
-              <p className='text-2xl font-bold'>{uniqueSourcesCount}</p>
+              <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} `}>Sources</p>
+              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                {uniqueSourcesCount}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -127,18 +150,22 @@ const Home = () => {
           <CardContent className='flex items-center gap-4 py-6'>
             <BarChart3 className='w-12 h-12 text-white' />
             <div>
-              <p className='text-lg text-orange-600'>Categories</p>
-              <p className='text-2xl font-bold'>{uniqueCategoriesCount}</p>
+              <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-orange-600'} `}>Categories</p>
+              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                {uniqueCategoriesCount}
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className='bg-white w-full h-[200px]'>
+        <Card
+          className={`${settings.mode === 'dark' ? 'bg-black border border-orange-500 shadow-md' : 'bg-white'} w-full h-[200px]`}
+        >
           <CardContent className='flex items-center gap-4 py-6'>
             <MessageSquare className='w-12 h-12 text-purple-600' />
             <div>
               <p className='text-lg text-gray-600'>Total Bookmarks</p>
-              <p className='text-2xl font-bold'>{totalCommentsCount}</p>
+              <p className='text-2xl font-bold'>{totalBookmarksCount}</p>
             </div>
           </CardContent>
         </Card>
@@ -154,27 +181,29 @@ const Home = () => {
         {/* Grid layout for 3 columns */}
         <PerfectScrollbarWrapper onScroll={onScroll}>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {Array.from(new Set(newsData.map(news => news.source))).map(source => (
-              <div key={source} className='bg-white p-4 rounded-lg shadow-md'>
-                <h3 className='text-lg font-bold mb-3'>{source}</h3>
-                {newsData
-                  .filter(news => news.source === source)
-                  .slice(0, 3) // Display up to 3 articles per source
-                  .map(news => (
-                    <div key={news.id} className='border-b border-gray-300 py-2'>
-                      <a
-                        href={news.link}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-orange-500 hover:underline font-medium'
-                      >
-                        {news.title}
-                      </a>
-                      {/* <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p> */}
-                    </div>
-                  ))}
-              </div>
-            ))}
+            {Array.from(new Set(newsData.map(news => news.source)))
+              .slice(0, 6)
+              .map(source => (
+                <div key={source} className='bg-white p-4 rounded-lg shadow-md'>
+                  <h3 className='text-lg font-bold mb-3'>{source}</h3>
+                  {newsData
+                    .filter(news => news.source === source)
+                    .slice(0, 3) // Display up to 3 articles per source
+                    .map(news => (
+                      <div key={news.id} className='border-b border-gray-300 py-2'>
+                        <a
+                          href={news.link}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='text-orange-500 hover:underline font-medium'
+                        >
+                          {news.title}
+                        </a>
+                        {/* <p className='text-sm text-gray-600'>{news.contentSnippet.slice(0, 50)}</p> */}
+                      </div>
+                    ))}
+                </div>
+              ))}
           </div>
         </PerfectScrollbarWrapper>
       </div>
