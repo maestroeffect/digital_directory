@@ -159,13 +159,17 @@ const Home = () => {
         </Card>
 
         <Card
-          className={`${settings.mode === 'dark' ? 'bg-black border border-orange-500 shadow-md' : 'bg-white'} w-full h-[200px]`}
+          className={`${settings.mode === 'dark' ? 'bg-black border border-white shadow-md' : 'bg-white'} w-full h-[200px]`}
         >
           <CardContent className='flex items-center gap-4 py-6'>
             <MessageSquare className='w-12 h-12 text-purple-600' />
             <div>
-              <p className='text-lg text-gray-600'>Total Bookmarks</p>
-              <p className='text-2xl font-bold'>{totalBookmarksCount}</p>
+              <p className={`text-lg ${settings.mode === 'dark' ? 'text-orange-600' : 'text-orange-600'} `}>
+                Total Bookmarks
+              </p>
+              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                {totalBookmarksCount}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -173,7 +177,11 @@ const Home = () => {
 
       {/* Latest News Section */}
       <div className='w-full'>
-        <h2 className='text-xl text-center font-semibold mt-6 mb-2'>📰 Latest News</h2>
+        <h2
+          className={`text-xl text-center font-semibold mt-6 mb-2 ${settings.mode === 'dark' ? 'text-white' : 'text-black'}`}
+        >
+          📰 Latest News
+        </h2>
         {/* Horizontal Line */}
         <Divider className='border-gray-300 my-3' />
 
@@ -182,7 +190,7 @@ const Home = () => {
         <PerfectScrollbarWrapper onScroll={onScroll}>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             {Array.from(new Set(newsData.map(news => news.source)))
-              .slice(0, 6)
+              .slice(0, 3)
               .map(source => (
                 <div key={source} className='bg-white p-4 rounded-lg shadow-md'>
                   <h3 className='text-lg font-bold mb-3'>{source}</h3>
