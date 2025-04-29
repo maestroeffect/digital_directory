@@ -1,27 +1,11 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 // GET /api/auth/bookmarks/all
-export async function GET(req) {
+export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const userId = parseInt(session.user.id, 10)
-
-    if (isNaN(userId)) {
-      return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 })
-    }
-
     const bookmarks = await db.bookmark.findMany({
-      where: { userId },
       include: {
         news: {
           select: {
@@ -36,6 +20,13 @@ export async function GET(req) {
           select: {
             name: true,
             sourceUrl: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
           }
         }
       }
