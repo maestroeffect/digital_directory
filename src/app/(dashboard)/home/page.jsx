@@ -93,19 +93,19 @@ const Home = () => {
   useEffect(() => {
     const fetchBookmarks = async () => {
       try {
-        const response = await fetch('/api/auth/bookmarks?source=all')
+        const response = await fetch('/api/auth/bookmarks/all')
         const data = await response.json()
 
-        console.log(data)
-
         if (response.ok) {
+          console.log(data)
+
           setTotalBookmarksCount(data.bookmarks.length)
         } else {
           console.log('Failed to fetch bookmarks:', data.error)
           toast.error('Not Yet Logged In')
         }
       } catch (error) {
-        console.error('Error fetching bookmarks:', error)
+        console.log('Error fetching bookmarks:', error.message)
       }
     }
 

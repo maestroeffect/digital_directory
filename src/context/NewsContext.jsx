@@ -78,7 +78,7 @@ export const NewsProvider = ({ children }) => {
         .map((item, index) => {
           const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
 
-          console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+          // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
 
           return {
             id: index,

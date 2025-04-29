@@ -65,7 +65,7 @@ const NewsReader = () => {
     )
   }
 
-  console.log(activeNews)
+  // console.log(activeNews)
 
   return (
     <div className={`p-4 rounded-lg`}>

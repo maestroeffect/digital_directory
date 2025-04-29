@@ -132,10 +132,10 @@ const NewsList = ({ loading, onScroll }) => {
 
   const toggleBookmark = async newsItem => {
     // console.log(sourceUrl)
-    console.log('News Item in Bookmark:', newsItem)
-    console.log('Fetching bookmarks for news ID:', newsItem.id)
-    console.log('Bookmarking news:', newsItem.title)
-    console.log(sourceUrl)
+    // console.log('News Item in Bookmark:', newsItem)
+    // console.log('Fetching bookmarks for news ID:', newsItem.id)
+    // console.log('Bookmarking news:', newsItem.title)
+    // console.log(sourceUrl)
 
     // Validate required fields
     if (!newsItem.id || !newsItem.title || !newsItem.source || !sourceUrl) {
@@ -173,18 +173,18 @@ const NewsList = ({ loading, onScroll }) => {
       // In your API handler
       const newsUuid = uuidv4() // Generate a new UUID for the news item
 
-      console.log('Request Body:', {
-        newsId: newsItem.id,
-        newsUuid,
-        title: newsItem.title,
-        content: newsItem.contentSnippet || 'No content available.',
-        source: newsItem.source,
+      // console.log('Request Body:', {
+      //   newsId: newsItem.id,
+      //   newsUuid,
+      //   title: newsItem.title,
+      //   content: newsItem.contentSnippet || 'No content available.',
+      //   source: newsItem.source,
 
-        // sourceId:
-        newsUrl: newsItem.link,
-        sourceUrl,
-        publishedAt: newsItem.publishedDate || new Date().toISOString()
-      })
+      //   // sourceId:
+      //   newsUrl: newsItem.link,
+      //   sourceUrl,
+      //   publishedAt: newsItem.publishedDate || new Date().toISOString()
+      // })
 
       const response = await fetch('/api/auth/bookmarks', {
         method: isBookmarked ? 'DELETE' : 'POST',
@@ -276,7 +276,7 @@ const NewsList = ({ loading, onScroll }) => {
                   >
                     {/* Ensure the icon activates based on bookmark state */}
                     {/* {console.log('Hiinews,', news.id)} */}
-                    {bookmarked.has(news.id) ? <Bookmark fontSize={20} /> : <BookmarkBorder fontSize={10} />}
+                    {bookmarked.has(news.id) ? <Bookmark fontSize='small' /> : <BookmarkBorder fontSize='small' />}
                   </div>
                 )}
               </div>
