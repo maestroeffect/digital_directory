@@ -276,7 +276,7 @@ const NewsList = ({ loading, onScroll }) => {
                   >
                     {/* Ensure the icon activates based on bookmark state */}
                     {/* {console.log('Hiinews,', news.id)} */}
-                    {bookmarked.has(news.id) ? <Bookmark fontSize='medium' /> : <BookmarkBorder fontSize='medium' />}
+                    {bookmarked.has(news.id) ? <Bookmark fontSize={20} /> : <BookmarkBorder fontSize={10} />}
                   </div>
                 )}
               </div>

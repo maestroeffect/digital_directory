@@ -78,7 +78,7 @@ export const NewsProvider = ({ children }) => {
         .map((item, index) => {
           const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
 
-          //  console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+          console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
 
           return {
             id: index,
@@ -156,6 +156,7 @@ export const NewsProvider = ({ children }) => {
     // If it's a YouTube video or already has content, just set it as active
     if (!selectedNews || selectedNews.fullContent || selectedNews.videoId) {
       setActiveId(id)
+      setLoadingArticle(false) // ✅ FIX: Ensure the loader is cleared
 
       return
     }

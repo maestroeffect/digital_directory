@@ -30,7 +30,7 @@ const NewsReader = () => {
 
   // Auto-retry logic when content fails
   useEffect(() => {
-    if (!loadingArticle && activeId && (!activeNews || !activeNews.fullContent)) {
+    if (!loadingArticle && activeId && (!activeNews || (!activeNews.fullContent && !activeNews.videoId))) {
       const toastId = toast.warn('❌ Failed to fetch news. Kindly Reclick or wait, refreshing in 5 secs...', {
         autoClose: 5000
       })
@@ -64,6 +64,8 @@ const NewsReader = () => {
       </div>
     )
   }
+
+  console.log(activeNews)
 
   return (
     <div className={`p-4 rounded-lg`}>

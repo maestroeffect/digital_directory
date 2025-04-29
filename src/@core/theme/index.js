@@ -1,5 +1,5 @@
 // Next Imports
-import { Inter } from 'next/font/google'
+import { Inter, EB_Garamond } from 'next/font/google'
 
 // Theme Options Imports
 import overrides from './overrides'
@@ -9,7 +9,7 @@ import shadows from './shadows'
 import customShadows from './customShadows'
 import typography from './typography'
 
-const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
+const inter = EB_Garamond({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'] })
 
 const theme = (settings, mode, direction) => {
   return {

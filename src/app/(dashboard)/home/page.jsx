@@ -6,6 +6,10 @@ import { BarChart3, Newspaper, Users, MessageSquare } from 'lucide-react'
 
 import { Divider } from '@mui/material'
 
+import { toast } from 'react-toastify'
+
+import { useSession } from 'next-auth/react'
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 import qubicwebgif from '@assets/img/logo.gif'
@@ -28,6 +32,8 @@ const Home = () => {
   const [totalBookmarksCount, setTotalBookmarksCount] = useState(0)
 
   const { settings } = useSettings()
+
+  const session = useSession()
 
   useEffect(() => {
     console.log('newsData:', newsData)
@@ -90,10 +96,13 @@ const Home = () => {
         const response = await fetch('/api/auth/bookmarks?source=all')
         const data = await response.json()
 
+        console.log(data)
+
         if (response.ok) {
           setTotalBookmarksCount(data.bookmarks.length)
         } else {
-          console.error('Failed to fetch bookmarks:', data.error)
+          console.log('Failed to fetch bookmarks:', data.error)
+          toast.error('Not Yet Logged In')
         }
       } catch (error) {
         console.error('Error fetching bookmarks:', error)
@@ -106,88 +115,88 @@ const Home = () => {
   const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
 
   return (
-    <div className='flex flex-col items-center justify-center p-4 space-y-6'>
-      <h1 className={`flex items-center gap-2 text-3xl font-bold ${settings.mode === 'dark' ? 'text-white' : ''}`}>
-        <img
-          src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
-          alt='QubicWeb Logo'
-          className='w-20 h-20'
-        />
-        Digital Directory
-      </h1>
+    <PerfectScrollbarWrapper onScroll={onScroll}>
+      <div className='flex flex-col items-center justify-center p-4 space-y-6'>
+        <h1 className={`flex items-center gap-2 text-3xl font-bold ${settings.mode === 'dark' ? 'text-white' : ''}`}>
+          <img
+            src={settings.mode === 'dark' ? qubicwebgifwhite.src : qubicwebgif.src}
+            alt='QubicWeb Logo'
+            className='w-20 h-20'
+          />
+          Digital Directory
+        </h1>
 
-      {/* Analytics Cards */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
-        <Card
-          className={`bg-black ${settings.mode === 'dark' ? 'border border-orange-500 shadow-md' : ''} w-full h-[200px]`}
-        >
-          <CardContent className='flex items-center gap-4 py-6'>
-            <Newspaper className='w-12 h-12 text-white' />
-            <div>
-              <p className='text-lg text-orange-600'>Total News Feeds</p>
-              <p className='text-2xl text-white font-bold'>{totalNewsCount}</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Analytics Cards */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
+          <Card
+            className={`bg-black ${settings.mode === 'dark' ? 'border border-orange-500 shadow-md' : ''} w-full h-[200px]`}
+          >
+            <CardContent className='flex items-center gap-4 py-6'>
+              <Newspaper className='w-12 h-12 text-white' />
+              <div>
+                <p className='text-lg text-orange-600'>Total News Feeds</p>
+                <p className='text-2xl text-white font-bold'>{totalNewsCount}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card
-          className={`bg-white-500 ${settings.mode === 'dark' ? 'border border-white shadow-md' : ''}  w-full h-[200px]`}
-        >
-          <CardContent className='flex items-center gap-4 py-6'>
-            <Users className='w-12 h-12 text-green-600' />
-            <div>
-              <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} `}>Sources</p>
-              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
-                {uniqueSourcesCount}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <Card
+            className={`bg-white-500 ${settings.mode === 'dark' ? 'border border-white shadow-md' : ''}  w-full h-[200px]`}
+          >
+            <CardContent className='flex items-center gap-4 py-6'>
+              <Users className='w-12 h-12 text-green-600' />
+              <div>
+                <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} `}>Sources</p>
+                <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                  {uniqueSourcesCount}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card
-          className={`bg-[#000] ${settings.mode === 'dark' ? 'border border-orange-500 shadow-md' : ''} w-full h-[200px]`}
-        >
-          <CardContent className='flex items-center gap-4 py-6'>
-            <BarChart3 className='w-12 h-12 text-white' />
-            <div>
-              <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-orange-600'} `}>Categories</p>
-              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
-                {uniqueCategoriesCount}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <Card
+            className={`bg-[#000] ${settings.mode === 'dark' ? 'border border-orange-500 shadow-md' : ''} w-full h-[200px]`}
+          >
+            <CardContent className='flex items-center gap-4 py-6'>
+              <BarChart3 className='w-12 h-12 text-white' />
+              <div>
+                <p className={`text-lg ${settings.mode === 'dark' ? 'text-white' : 'text-orange-600'} `}>Categories</p>
+                <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                  {uniqueCategoriesCount}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card
-          className={`${settings.mode === 'dark' ? 'bg-black border border-white shadow-md' : 'bg-white'} w-full h-[200px]`}
-        >
-          <CardContent className='flex items-center gap-4 py-6'>
-            <MessageSquare className='w-12 h-12 text-purple-600' />
-            <div>
-              <p className={`text-lg ${settings.mode === 'dark' ? 'text-orange-600' : 'text-orange-600'} `}>
-                Total Bookmarks
-              </p>
-              <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
-                {totalBookmarksCount}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <Card
+            className={`${settings.mode === 'dark' ? 'bg-black border border-white shadow-md' : 'bg-white'} w-full h-[200px]`}
+          >
+            <CardContent className='flex items-center gap-4 py-6'>
+              <MessageSquare className='w-12 h-12 text-purple-600' />
+              <div>
+                <p className={`text-lg ${settings.mode === 'dark' ? 'text-orange-600' : 'text-orange-600'} `}>
+                  Total Bookmarks
+                </p>
+                <p className={`text-2xl ${settings.mode === 'dark' ? 'text-white' : 'text-gray-600'} font-bold`}>
+                  {totalBookmarksCount}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Latest News Section */}
-      <div className='w-full'>
-        <h2
-          className={`text-xl text-center font-semibold mt-6 mb-2 ${settings.mode === 'dark' ? 'text-white' : 'text-black'}`}
-        >
-          📰 Latest News
-        </h2>
-        {/* Horizontal Line */}
-        <Divider className='border-gray-300 my-3' />
+        {/* Latest News Section */}
+        <div className='w-full'>
+          <h2
+            className={`text-xl text-center font-semibold mt-6 mb-2 ${settings.mode === 'dark' ? 'text-white' : 'text-black'}`}
+          >
+            📰 Latest News
+          </h2>
+          {/* Horizontal Line */}
+          <Divider className='border-gray-300 my-3' />
 
-        {/* News from Different Sources */}
-        {/* Grid layout for 3 columns */}
-        <PerfectScrollbarWrapper onScroll={onScroll}>
+          {/* News from Different Sources */}
+          {/* Grid layout for 3 columns */}
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             {Array.from(new Set(newsData.map(news => news.source)))
               .slice(0, 3)
@@ -213,9 +222,9 @@ const Home = () => {
                 </div>
               ))}
           </div>
-        </PerfectScrollbarWrapper>
+        </div>
       </div>
-    </div>
+    </PerfectScrollbarWrapper>
   )
 }
 
