@@ -1,47 +1,46 @@
-import { openDB } from 'idb'
-import { del } from 'idb-keyval'
+// cache.js
+import { set, get, del, clear, keys } from 'idb-keyval'
 
-const DB_NAME = 'newsCacheDB'
-const STORE_NAME = 'newsDataStore'
-const CACHE_KEY = 'newsItems'
-const ONE_DAY = 24 * 60 * 60 * 1000 // 1 day in milliseconds
-
-async function getDB() {
-  return openDB(DB_NAME, 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        const store = db.createObjectStore(STORE_NAME)
-
-        store.put({ data: [], timestamp: 0 }, CACHE_KEY)
-      }
-    }
-  })
+export const setCachedNews = async (key, data) => {
+  try {
+    await set(key, data)
+  } catch (e) {
+    console.error('Error saving to IndexedDB:', e)
+  }
 }
 
-export const getCachedNews = key => {
-  if (typeof window === 'undefined') return null
-
-  const cached = localStorage.getItem(key)
-
-  if (!cached) return null
-
+export const getCachedNews = async key => {
   try {
-    const parsed = JSON.parse(cached)
-
-    return parsed
+    return await get(key)
   } catch (e) {
-    console.error('Error parsing cached news:', e)
+    console.error('Error retrieving from IndexedDB:', e)
 
     return null
   }
 }
 
-export const setCachedNews = (key, data) => {
-  if (typeof window === 'undefined') return
-
+export const deleteCachedNews = async key => {
   try {
-    localStorage.setItem(key, JSON.stringify(data))
+    await del(key)
   } catch (e) {
-    console.error('Error setting cached news:', e)
+    console.error('Error deleting from IndexedDB:', e)
+  }
+}
+
+export const clearAllCachedNews = async () => {
+  try {
+    await clear()
+  } catch (e) {
+    console.error('Error clearing IndexedDB:', e)
+  }
+}
+
+export const getAllCacheKeys = async () => {
+  try {
+    return await keys()
+  } catch (e) {
+    console.error('Error fetching keys from IndexedDB:', e)
+
+    return []
   }
 }

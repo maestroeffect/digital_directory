@@ -60,8 +60,8 @@ export const NewsProvider = ({ children }) => {
         throw new Error('No internet connection.')
       }
 
-      // Check for cache
-      const cached = getCachedNews('allNews')
+      // ✅ Await for cached news
+      const cached = await getCachedNews('allNews')
 
       if (cached) {
         const filtered = filterNewsBySource(cached)
@@ -100,7 +100,8 @@ export const NewsProvider = ({ children }) => {
         }
       })
 
-      setCachedNews('allNews', allNews) // ✅ Cache the entire dataset
+      // ✅ Save to IndexedDB
+      await setCachedNews('allNews', allNews)
 
       const filtered = filterNewsBySource(allNews)
 
@@ -113,7 +114,7 @@ export const NewsProvider = ({ children }) => {
       } else if (error.message.includes('HTTP error! status: 404')) {
         toast.error('❌ News not found (404). Please try again later.')
       } else {
-        toast.error('❌ An unexpected error occurred. Please Refresh.')
+        toast.error('❌ An unexpected error occurred. Please refresh.')
       }
 
       setNewsData([])
