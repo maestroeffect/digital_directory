@@ -18,21 +18,16 @@ async function getDB() {
   })
 }
 
-export async function getCachedNews() {
-  const db = await getDB()
-  const cache = await db.get(STORE_NAME, CACHE_KEY)
+export const getCachedNews = key => {
+  if (typeof window === 'undefined') return null
+  const cached = localStorage.getItem(`news-${key}`)
 
-  if (cache && Date.now() - cache.timestamp < ONE_DAY) {
-    return cache.data
-  }
-
-  return null
+  return cached ? JSON.parse(cached) : null
 }
 
-export async function setCachedNews(data) {
-  const db = await getDB()
-
-  await db.put(STORE_NAME, { data, timestamp: Date.now() }, CACHE_KEY)
+export const setCachedNews = (key, data) => {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(`news-${key}`, JSON.stringify({ data, timestamp: Date.now() }))
 }
 
 export const clearNewsCache = async () => {

@@ -53,34 +53,35 @@ export const NewsProvider = ({ children }) => {
   }
 
   const fetchNews = async () => {
-    // if (!source) return
     setLoading(true)
 
     try {
-      // Check if the user is offline before trying to fetch
-      if (!navigator.onLine) {
-        throw new Error('No internet connection.')
+      if (!navigator.onLine) throw new Error('No internet connection.')
+
+      const cacheKey = source || 'all'
+      const cached = getCachedNews(cacheKey)
+      const now = Date.now()
+
+      if (cached && now - cached.timestamp < 10 * 60 * 1000) {
+        setNewsData(cached.data)
+        setLoading(false)
+
+        return
       }
 
       const response = await fetch('https://api2.qubicweb.com:8082/v2/feed', {
         next: { revalidate: 10 }
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
       const filteredItems = items
-
-        // .filter(item => item.source && generateSlug(item.source) === source)
-        .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
+        .filter(item => !source || generateSlug(item.source) === source)
         .map((item, index) => {
-          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
-
-          // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+          const videoId = isYouTubeLink(item.link)
 
           return {
             id: index,
@@ -90,24 +91,19 @@ export const NewsProvider = ({ children }) => {
             contentSnippet: item.contentSnippet,
             publishedDate: item.publishedDate,
             image: item.image || '',
-            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
-            videoId, // Store YouTube video ID
+            fullContent: videoId ? '' : '',
+            videoId,
             additionalImages: []
           }
         })
 
       setNewsData(filteredItems)
+      setCachedNews(cacheKey, filteredItems) // ✅ Cache it
     } catch (error) {
       console.error('Error fetching news:', error)
-
-      if (error.message === 'No internet connection.') {
-        toast.error('❌ No internet connection. Please check your network.')
-      } else if (error.message.includes('HTTP error! status: 404')) {
-        toast.error('❌ News not found (404). Please try again later.')
-      } else {
-        toast.error('❌ An unexpected error occurred. Please Refresh.')
-      }
-
+      toast.error(
+        error.message.includes('No internet') ? '❌ No internet connection.' : '❌ An error occurred. Please refresh.'
+      )
       setNewsData([])
     } finally {
       setLoading(false)
