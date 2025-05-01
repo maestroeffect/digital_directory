@@ -7,6 +7,8 @@ import { useParams } from 'next/navigation'
 import Mercury from '@postlight/mercury-parser'
 import { toast } from 'react-toastify'
 
+import { getCachedNews, setCachedNews } from '@/utils/newsCache'
+
 const NewsContext = createContext()
 
 export const NewsProvider = ({ children }) => {
@@ -55,6 +57,20 @@ export const NewsProvider = ({ children }) => {
     setLoading(true)
 
     try {
+      const cached = await getCachedNews()
+
+      if (cached) {
+        setNewsData(cached)
+        setLoading(false)
+
+        return
+      }
+
+      // ✅ Show fetching toast ONLY if there's no cached or existing data
+      if (newsData.length === 0) {
+        toast.info('📰 Fetching data...')
+      }
+
       // Check if the user is offline before trying to fetch
       if (!navigator.onLine) {
         throw new Error('No internet connection.')
@@ -71,30 +87,54 @@ export const NewsProvider = ({ children }) => {
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
-      const filteredItems = items
+      // ✅ Map and cache all items
+      const allItems = items.map((item, index) => {
+        const videoId = isYouTubeLink(item.link)
 
-        // .filter(item => item.source && generateSlug(item.source) === source)
-        .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
-        .map((item, index) => {
-          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
+        return {
+          id: index,
+          title: item.title,
+          link: item.link,
+          source: item.source || 'Unknown Source',
+          contentSnippet: item.contentSnippet,
+          publishedDate: item.publishedDate,
+          image: item.image || '',
+          fullContent: videoId ? '' : '',
+          videoId,
+          additionalImages: []
+        }
+      })
 
-          // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+      // const filteredItems = items
+      // ✅ Store all in cache
+      await setCachedNews(allItems)
 
-          return {
-            id: index,
-            title: item.title,
-            link: item.link,
-            source: item.source || 'Unknown Source',
-            contentSnippet: item.contentSnippet,
-            publishedDate: item.publishedDate,
-            image: item.image || '',
-            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
-            videoId, // Store YouTube video ID
-            additionalImages: []
-          }
-        })
+      //   // .filter(item => item.source && generateSlug(item.source) === source)
+      //   .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
+      //   .map((item, index) => {
+      //     const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
+
+      //     // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+
+      //     return {
+      //       id: index,
+      //       title: item.title,
+      //       link: item.link,
+      //       source: item.source || 'Unknown Source',
+      //       contentSnippet: item.contentSnippet,
+      //       publishedDate: item.publishedDate,
+      //       image: item.image || '',
+      //       fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
+      //       videoId, // Store YouTube video ID
+      //       additionalImages: []
+      //     }
+      //   })
+      // ✅ Then filter by slug/source
+      const filteredItems = !source ? allItems : allItems.filter(item => generateSlug(item.source) === source)
 
       setNewsData(filteredItems)
+
+      // await setCachedNews(filteredItems)
     } catch (error) {
       console.error('Error fetching news:', error)
 

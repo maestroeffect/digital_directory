@@ -43,6 +43,8 @@
     "classnames": "2.5.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
+    "idb": "^8.0.2",
+    "idb-keyval": "^6.2.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.480.0",
     "motion": "^12.5.0",

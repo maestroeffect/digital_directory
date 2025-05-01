@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 
 import { Divider } from '@mui/material'
 
-import TopBar from '@/components/Topbar'
-
 const FeedLayout = ({ children, activeLink }) => {
   // Ensure children is always an array for easier handling
   const childrenArray = Array.isArray(children) ? children : [children]

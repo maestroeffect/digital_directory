@@ -36,7 +36,7 @@ const Home = () => {
   const session = useSession()
 
   useEffect(() => {
-    console.log('newsData:', newsData)
+    // console.log('newsData:', newsData)
 
     if (newsData.length > 0) {
       const totalNews = newsData.length
