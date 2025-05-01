@@ -57,20 +57,6 @@ export const NewsProvider = ({ children }) => {
     setLoading(true)
 
     try {
-      const cached = await getCachedNews()
-
-      if (cached) {
-        setNewsData(cached)
-        setLoading(false)
-
-        return
-      }
-
-      // ✅ Show fetching toast ONLY if there's no cached or existing data
-      if (newsData.length === 0) {
-        toast.info('📰 Fetching data...')
-      }
-
       // Check if the user is offline before trying to fetch
       if (!navigator.onLine) {
         throw new Error('No internet connection.')
@@ -80,7 +66,9 @@ export const NewsProvider = ({ children }) => {
         next: { revalidate: 10 }
       })
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
@@ -109,7 +97,6 @@ export const NewsProvider = ({ children }) => {
         })
 
       setNewsData(filteredItems)
-      await setCachedNews(filteredItems)
     } catch (error) {
       console.error('Error fetching news:', error)
 
