@@ -80,61 +80,36 @@ export const NewsProvider = ({ children }) => {
         next: { revalidate: 10 }
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
-      // ✅ Map and cache all items
-      const allItems = items.map((item, index) => {
-        const videoId = isYouTubeLink(item.link)
+      const filteredItems = items
 
-        return {
-          id: index,
-          title: item.title,
-          link: item.link,
-          source: item.source || 'Unknown Source',
-          contentSnippet: item.contentSnippet,
-          publishedDate: item.publishedDate,
-          image: item.image || '',
-          fullContent: videoId ? '' : '',
-          videoId,
-          additionalImages: []
-        }
-      })
+        // .filter(item => item.source && generateSlug(item.source) === source)
+        .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
+        .map((item, index) => {
+          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
 
-      // const filteredItems = items
-      // ✅ Store all in cache
-      await setCachedNews(allItems)
+          // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
 
-      //   // .filter(item => item.source && generateSlug(item.source) === source)
-      //   .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
-      //   .map((item, index) => {
-      //     const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
-
-      //     // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
-
-      //     return {
-      //       id: index,
-      //       title: item.title,
-      //       link: item.link,
-      //       source: item.source || 'Unknown Source',
-      //       contentSnippet: item.contentSnippet,
-      //       publishedDate: item.publishedDate,
-      //       image: item.image || '',
-      //       fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
-      //       videoId, // Store YouTube video ID
-      //       additionalImages: []
-      //     }
-      //   })
-      // ✅ Then filter by slug/source
-      const filteredItems = !source ? allItems : allItems.filter(item => generateSlug(item.source) === source)
+          return {
+            id: index,
+            title: item.title,
+            link: item.link,
+            source: item.source || 'Unknown Source',
+            contentSnippet: item.contentSnippet,
+            publishedDate: item.publishedDate,
+            image: item.image || '',
+            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
+            videoId, // Store YouTube video ID
+            additionalImages: []
+          }
+        })
 
       setNewsData(filteredItems)
-
-      // await setCachedNews(filteredItems)
+      await setCachedNews(filteredItems)
     } catch (error) {
       console.error('Error fetching news:', error)
 
