@@ -53,13 +53,23 @@ export const NewsProvider = ({ children }) => {
   }
 
   const fetchNews = async () => {
-    // if (!source) return
     setLoading(true)
 
     try {
-      // Check if the user is offline before trying to fetch
       if (!navigator.onLine) {
         throw new Error('No internet connection.')
+      }
+
+      // Check for cache
+      const cached = getCachedNews('allNews')
+
+      if (cached) {
+        const filtered = filterNewsBySource(cached)
+
+        setNewsData(filtered)
+        setLoading(false)
+
+        return
       }
 
       const response = await fetch('https://api2.qubicweb.com:8082/v2/feed', {
@@ -73,30 +83,28 @@ export const NewsProvider = ({ children }) => {
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
-      const filteredItems = items
+      const allNews = items.map((item, index) => {
+        const videoId = isYouTubeLink(item.link)
 
-        // .filter(item => item.source && generateSlug(item.source) === source)
-        .filter(item => !source || generateSlug(item.source) === source) // Fetch all if no source
-        .map((item, index) => {
-          const videoId = isYouTubeLink(item.link) // Check if it's a YouTube link
+        return {
+          id: index,
+          title: item.title,
+          link: item.link,
+          source: item.source || 'Unknown Source',
+          contentSnippet: item.contentSnippet,
+          publishedDate: item.publishedDate,
+          image: item.image || '',
+          fullContent: videoId ? '' : '',
+          videoId,
+          additionalImages: []
+        }
+      })
 
-          // console.log('Video ID for', item.link, ':', videoId) // Log detected video ID
+      setCachedNews('allNews', allNews) // ✅ Cache the entire dataset
 
-          return {
-            id: index,
-            title: item.title,
-            link: item.link,
-            source: item.source || 'Unknown Source',
-            contentSnippet: item.contentSnippet,
-            publishedDate: item.publishedDate,
-            image: item.image || '',
-            fullContent: videoId ? '' : '', // Don't fetch full content for YouTube videos
-            videoId, // Store YouTube video ID
-            additionalImages: []
-          }
-        })
+      const filtered = filterNewsBySource(allNews)
 
-      setNewsData(filteredItems)
+      setNewsData(filtered)
     } catch (error) {
       console.error('Error fetching news:', error)
 
@@ -112,6 +120,12 @@ export const NewsProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterNewsBySource = newsList => {
+    if (!source) return newsList
+
+    return newsList.filter(item => generateSlug(item.source) === source)
   }
 
   useEffect(() => {

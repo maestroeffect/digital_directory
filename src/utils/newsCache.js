@@ -20,17 +20,28 @@ async function getDB() {
 
 export const getCachedNews = key => {
   if (typeof window === 'undefined') return null
-  const cached = localStorage.getItem(`news-${key}`)
 
-  return cached ? JSON.parse(cached) : null
+  const cached = localStorage.getItem(key)
+
+  if (!cached) return null
+
+  try {
+    const parsed = JSON.parse(cached)
+
+    return parsed
+  } catch (e) {
+    console.error('Error parsing cached news:', e)
+
+    return null
+  }
 }
 
 export const setCachedNews = (key, data) => {
   if (typeof window === 'undefined') return
-  localStorage.setItem(`news-${key}`, JSON.stringify({ data, timestamp: Date.now() }))
-}
 
-export const clearNewsCache = async () => {
-  await del('cachedNews')
-  console.log('🧹 IndexedDB news cache cleared.')
+  try {
+    localStorage.setItem(key, JSON.stringify(data))
+  } catch (e) {
+    console.error('Error setting cached news:', e)
+  }
 }
