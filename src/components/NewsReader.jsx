@@ -27,9 +27,16 @@ const NewsReader = () => {
 
   console.log(newsId)
 
-  const { newsData, activeId, loadingArticle, fontSize, handleNewsClick } = useNews()
+  const { newsData, activeId, setActiveId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
   const activeNews = newsData.find(news => news.id === activeId)
+
+  useEffect(() => {
+    if (newsId) {
+      setActiveId(newsId)
+      handleNewsClick(newsId)
+    }
+  }, [newsId])
 
   // Settings hook
   const { settings } = useSettings()
