@@ -22,11 +22,6 @@ import { useSettings } from '@core/hooks/useSettings'
 // import PerfectScrollbarWrapper from './PerfectScrollbar'
 
 const NewsReader = () => {
-  const searchParams = useSearchParams()
-  const newsId = searchParams.get('newsId')
-
-  console.log(newsId)
-
   const { newsData, activeId, setActiveId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
   const activeNews = newsData.find(news => news.id === activeId)

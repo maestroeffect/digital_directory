@@ -52,18 +52,24 @@ const NewsList = ({ loading, onScroll }) => {
     }
   }, [status, session, newsData, sourceUrl])
 
+  //  if (queryNewsId && newsData.length > 0) {
+  //    const numericId = parseInt(queryNewsId)
+
+  //    if (!isNaN(numericId)) {
+  //      handleNewsClick(numericId)
+  //    }
+  //  }
+  useEffect(() => {
+    if (queryNewsId) {
+      setActiveId(queryNewsId)
+      handleNewsClick(queryNewsId)
+    }
+  }, [queryNewsId])
+
   useEffect(() => {
     if (sourceUrlParam) {
       setSourceUrl(sourceUrlParam)
       setNewsData([]) // ✅ Clear the old news list
-
-      if (queryNewsId && newsData.length > 0) {
-        const numericId = parseInt(queryNewsId)
-
-        if (!isNaN(numericId)) {
-          handleNewsClick(numericId)
-        }
-      }
 
       setActiveId(null) // ✅ Reset active news when the source changes
     }
