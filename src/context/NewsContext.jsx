@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 import Mercury from '@postlight/mercury-parser'
 import { toast } from 'react-toastify'
 
-import { getCachedNews, setCachedNews } from '@/utils/newsCache'
+import { assignPerSourceIds, getCachedNews, setCachedNews } from '@/utils/newsCache'
 
 const NewsContext = createContext()
 
@@ -60,13 +60,13 @@ export const NewsProvider = ({ children }) => {
         throw new Error('No internet connection.')
       }
 
-      // ✅ Await for cached news
       const cached = await getCachedNews('allNews')
 
       if (cached) {
         const filtered = filterNewsBySource(cached)
+        const assigned = assignPerSourceIds(filtered)
 
-        setNewsData(filtered)
+        setNewsData(assigned)
         setLoading(false)
 
         return
@@ -83,11 +83,10 @@ export const NewsProvider = ({ children }) => {
       const data = await response.json()
       const items = Array.isArray(data.items) ? data.items : []
 
-      const allNews = items.map((item, index) => {
+      const allNews = items.map(item => {
         const videoId = isYouTubeLink(item.link)
 
         return {
-          id: index,
           title: item.title,
           link: item.link,
           source: item.source || 'Unknown Source',
@@ -100,12 +99,12 @@ export const NewsProvider = ({ children }) => {
         }
       })
 
-      // ✅ Save to IndexedDB
       await setCachedNews('allNews', allNews)
 
       const filtered = filterNewsBySource(allNews)
+      const assigned = assignPerSourceIds(filtered)
 
-      setNewsData(filtered)
+      setNewsData(assigned)
     } catch (error) {
       console.error('Error fetching news:', error)
 

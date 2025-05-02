@@ -44,3 +44,18 @@ export const getAllCacheKeys = async () => {
     return []
   }
 }
+
+export const assignPerSourceIds = newsArray => {
+  const seenSources = {}
+
+  return newsArray.map(news => {
+    const source = news.source
+
+    if (!seenSources[source]) seenSources[source] = 1
+    const assignedId = seenSources[source]
+
+    seenSources[source] += 1
+
+    return { ...news, id: assignedId }
+  })
+}
