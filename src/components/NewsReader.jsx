@@ -26,13 +26,6 @@ const NewsReader = () => {
 
   const activeNews = newsData.find(news => news.id === activeId)
 
-  useEffect(() => {
-    if (newsId) {
-      setActiveId(newsId)
-      handleNewsClick(newsId)
-    }
-  }, [newsId])
-
   // Settings hook
   const { settings } = useSettings()
   const [retrying, setRetrying] = useState(false)
