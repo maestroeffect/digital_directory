@@ -60,11 +60,10 @@ const NewsList = ({ loading, onScroll }) => {
   //    }
   //  }
   useEffect(() => {
-    if (queryNewsId) {
-      setActiveId(queryNewsId)
+    if (queryNewsId && newsData.length > 0) {
       handleNewsClick(queryNewsId)
     }
-  }, [queryNewsId])
+  }, [queryNewsId, newsData])
 
   useEffect(() => {
     if (sourceUrlParam) {
