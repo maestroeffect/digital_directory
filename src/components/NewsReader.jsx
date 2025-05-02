@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import { Divider } from '@mui/material'
 
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -20,6 +22,11 @@ import { useSettings } from '@core/hooks/useSettings'
 // import PerfectScrollbarWrapper from './PerfectScrollbar'
 
 const NewsReader = () => {
+  const searchParams = useSearchParams()
+  const newsId = searchParams.get('newsId')
+
+  console.log(newsId)
+
   const { newsData, activeId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
   const activeNews = newsData.find(news => news.id === activeId)
