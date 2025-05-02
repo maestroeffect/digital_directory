@@ -46,10 +46,12 @@ const Bookmarks = ({ onScroll }) => {
       const sourceMapping = {}
 
       sources.forEach(source => {
-        sourceMapping[source.name] = source.sourceUrl
+        sourceMapping[source.name] = {
+          sourceUrl: source.sourceUrl,
+          slug: source.slug // if available
+        }
       })
       setSourcesMap(sourceMapping)
-
       const bookmarksBySource = {}
 
       for (const source of sources) {
@@ -142,14 +144,15 @@ const Bookmarks = ({ onScroll }) => {
     setNewsData([]) // ✅ Clear the old news list
 
     // Then, navigate to the source page, potentially showing the full news list
-    if (sourcesMap[sourceName]) {
-      // window.location.href = sourcesMap[sourceName]
-      console.log(sourcesMap[sourceName])
+    const { sourceUrl } = sourcesMap[sourceName] || {}
 
-      router.push(`${sourcesMap[sourceName]}?newsId=${newsId}?sourceUrl=`)
+    if (sourceUrl) {
+      router.push(
+        `${sourceUrl}?newsId=${newsId}&source=${encodeURIComponent(sourceName)}&sourceUrl=${encodeURIComponent(sourceUrl)}`
+      )
       setActiveId(newsId)
     } else {
-      console.error('Source URL not found')
+      console.error('Source URL not found for', sourceName)
     }
 
     setLoadingArticle(false) // Set loading state to false once content is loaded
