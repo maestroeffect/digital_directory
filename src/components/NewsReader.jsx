@@ -24,6 +24,8 @@ import { useSettings } from '@core/hooks/useSettings'
 const NewsReader = () => {
   const { newsData, activeId, setActiveId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
+  console.log(activeId)
+
   const activeNews = newsData.find(news => news.id === activeId)
 
   // Settings hook
@@ -31,28 +33,28 @@ const NewsReader = () => {
   const [retrying, setRetrying] = useState(false)
 
   // Auto-retry logic when content fails
-  useEffect(() => {
-    if (!loadingArticle && activeId && (!activeNews || (!activeNews.fullContent && !activeNews.videoId))) {
-      const toastId = toast.warn('❌ Failed to fetch news. Kindly Reclick or wait, refreshing in 5 secs...', {
-        autoClose: 5000
-      })
+  // useEffect(() => {
+  //   if (!loadingArticle && activeId && (!activeNews || (!activeNews.fullContent && !activeNews.videoId))) {
+  //     const toastId = toast.warn('❌ Failed to fetch news. Kindly Reclick or wait, refreshing in 5 secs...', {
+  //       autoClose: 5000
+  //     })
 
-      setRetrying(true)
+  //     setRetrying(true)
 
-      const timer = setTimeout(() => {
-        toast.update(toastId, {
-          render: '🔄 Retrying now...',
-          type: 'info',
-          autoClose: 2000
-        })
+  //     const timer = setTimeout(() => {
+  //       toast.update(toastId, {
+  //         render: '🔄 Retrying now...',
+  //         type: 'info',
+  //         autoClose: 2000
+  //       })
 
-        handleNewsClick(activeId) // re-fetch
-        setRetrying(false)
-      }, 5000)
+  //       handleNewsClick(activeId) // re-fetch
+  //       setRetrying(false)
+  //     }, 5000)
 
-      return () => clearTimeout(timer)
-    }
-  }, [activeNews, activeId, loadingArticle])
+  //     return () => clearTimeout(timer)
+  //   }
+  // }, [activeNews, activeId, loadingArticle])
 
   if (!activeNews) {
     return (
