@@ -102,17 +102,17 @@ const Bookmarks = ({ onScroll }) => {
     setImages(prevImages => ({ ...prevImages, ...newImages }))
   }
 
-  const handleDelete = async bookmarkId => {
+  const handleDelete = async (bookmarkId, source) => {
     try {
       const res = await fetch(`/api/auth/bookmarks`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ newsId: bookmarkId }) // Send newsId in request body
+        body: JSON.stringify({ newsId: bookmarkId, source }) // Send newsId in request body
       })
 
-      if (!res.ok) throw new Error('Failed to delete bookmark')
+      if (!res.ok) throw new Error('Failed to delete zzzz')
 
       // Update state to remove the deleted bookmark
       setBookmarks(prevBookmarks => {
@@ -217,7 +217,7 @@ const Bookmarks = ({ onScroll }) => {
                     <RiDeleteBin6Line
                       size={20}
                       className='text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300'
-                      onClick={() => handleDelete(bookmark.id)}
+                      onClick={() => handleDelete(bookmark.id, source)}
                     />
                   </div>
                 </div>
