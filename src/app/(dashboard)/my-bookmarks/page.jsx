@@ -153,6 +153,8 @@ const Bookmarks = ({ onScroll }) => {
         `${sourceUrl}?newsId=${newsId}&source=${encodeURIComponent(sourceName)}&sourceUrl=${encodeURIComponent(sourceUrl)}`
       )
       setActiveId(newsId)
+
+      handleNewsClick(newsId)
     } else {
       console.error('Source URL not found for', sourceName)
     }
