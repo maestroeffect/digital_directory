@@ -131,7 +131,7 @@ const Bookmarks = ({ onScroll }) => {
 
       toast.success('Bookmark deleted successfully')
     } catch (error) {
-      console.error('Error deleting bookmark:', error)
+      console.log('Error deleting bookmark:', error)
       toast.error('Failed to delete bookmark')
     }
   }

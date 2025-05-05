@@ -33,7 +33,7 @@ const NavbarContent = () => {
   // Use the `useSession` hook from next-auth to get session data client-side
   const { data: session, status } = useSession()
 
-  console.log(status)
+  // console.log(status)
 
   if (status === 'loading') {
     return null // Or return null to show nothing while loading
