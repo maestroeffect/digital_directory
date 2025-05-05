@@ -104,6 +104,8 @@ const Bookmarks = ({ onScroll }) => {
 
   const handleDelete = async (bookmarkId, source) => {
     try {
+      console.log('Deleting bookmark:', { newsId: bookmarkId, source })
+
       const res = await fetch(`/api/auth/bookmarks`, {
         method: 'DELETE',
         headers: {
@@ -119,7 +121,7 @@ const Bookmarks = ({ onScroll }) => {
         const updatedBookmarks = {}
 
         Object.entries(prevBookmarks).forEach(([source, newsList]) => {
-          const filteredNewsList = newsList.filter(bookmark => bookmark.id !== bookmarkId)
+          const filteredNewsList = newsList.filter(bookmark => bookmark.newsId !== bookmarkId)
 
           if (filteredNewsList.length > 0) {
             updatedBookmarks[source] = filteredNewsList
@@ -217,7 +219,7 @@ const Bookmarks = ({ onScroll }) => {
                     <RiDeleteBin6Line
                       size={20}
                       className='text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300'
-                      onClick={() => handleDelete(bookmark.id, source)}
+                      onClick={() => handleDelete(bookmark.newsId, source)}
                     />
                   </div>
                 </div>

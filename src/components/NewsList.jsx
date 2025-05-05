@@ -52,6 +52,18 @@ const NewsList = ({ loading, onScroll }) => {
     }
   }, [status, session, newsData, sourceUrl])
 
+  useEffect(() => {
+    if (newsData.length > 0) {
+      const uniqueNews = Array.from(new Map(newsData.map(item => [item.id, item])).values())
+
+      if (uniqueNews.length !== newsData.length) {
+        setNewsData(uniqueNews)
+      } else {
+        console.log('Heheh')
+      }
+    }
+  }, [newsData])
+
   //  if (queryNewsId && newsData.length > 0) {
   //    const numericId = parseInt(queryNewsId)
 
@@ -231,7 +243,7 @@ const NewsList = ({ loading, onScroll }) => {
           .filter(news => news.id !== 0)
           .map(news => (
             <div
-              key={news.id}
+              key={`${news.source}-${news.id}`}
               onClick={() => handleNewsClick(news.id)}
               className={`p-3 border rounded-lg relative cursor-pointer ${settings.mode === 'dark' ? 'hover:bg-[#fff]' : 'bg-transparent hover:bg-black'}
               ${
