@@ -153,7 +153,7 @@ const Bookmarks = ({ onScroll }) => {
         `${sourceUrl}?newsId=${newsId}&source=${encodeURIComponent(sourceName)}&sourceUrl=${encodeURIComponent(sourceUrl)}`
       )
 
-      // setActiveId(newsId)
+      setActiveId(newsId)
 
       handleNewsClick(newsId)
     } else {
