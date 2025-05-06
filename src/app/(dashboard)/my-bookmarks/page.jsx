@@ -179,7 +179,11 @@ const Bookmarks = ({ onScroll }) => {
   return (
     <div className='p-5 max-w-6xl mx-auto'>
       <PerfectScrollbarWrapper onScroll={onScroll}>
-        <h2 className='text-center text-2xl font-semibold mb-3'>My Bookmarks</h2>
+        <h2
+          className={`text-center text-2xl font-semibold mb-3 ${settings.mode === 'dark' ? 'text-white' : 'text-dark'}`}
+        >
+          My Bookmarks
+        </h2>
         {Object.keys(bookmarks).length === 0 ? (
           <p>No bookmarks found.</p>
         ) : (
@@ -198,7 +202,7 @@ const Bookmarks = ({ onScroll }) => {
                   <h3 className={`${settings.mode === 'dark' ? 'text-white' : ''} text-lg font-semibold mb-2 mt-3`}>
                     <a
                       onClick={e => {
-                        console.log('Just got clicked')
+                        // console.log('Just got clicked')
                         e.preventDefault() // Prevent the default link behavior
                         handleSourceAndNewsClick(bookmark.newsId, source) // Call the new function to handle news click
                       }}
