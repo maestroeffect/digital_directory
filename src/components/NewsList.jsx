@@ -135,7 +135,7 @@ const NewsList = ({ loading, onScroll }) => {
       // console.log('Fetched Bookmarks:', data.bookmarks)
 
       // Only store bookmarks that belong to the selected source
-      const filteredBookmarks = new Set([...data.bookmarks.map(bookmark => bookmark.newsId)])
+      const filteredBookmarks = new Set([...data.bookmarks.map(bookmark => bookmark.news.uuid)])
 
       // console.log('Matched Data:', filteredBookmarks)
 
@@ -162,7 +162,7 @@ const NewsList = ({ loading, onScroll }) => {
       return
     }
 
-    const isBookmarked = bookmarked.has(newsItem.id)
+    const isBookmarked = bookmarked.has(newsItem.uuid)
 
     const confirmAction = await Swal.fire({
       title: isBookmarked ? 'Remove Bookmark?' : 'Bookmark this news?',
@@ -178,7 +178,7 @@ const NewsList = ({ loading, onScroll }) => {
     setBookmarked(prev => {
       const updated = new Set(prev)
 
-      isBookmarked ? updated.delete(newsItem.id) : updated.add(newsItem.id)
+      isBookmarked ? updated.delete(newsItem.uuid) : updated.add(newsItem.uuid)
 
       // ✅ Persist changes to localStorage
       window.localStorage.setItem('bookmarkedNews', JSON.stringify([...updated]))
