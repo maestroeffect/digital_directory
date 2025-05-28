@@ -2,12 +2,12 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 
 import Mercury from '@postlight/mercury-parser'
 import { toast } from 'react-toastify'
 
-import { assignPerSourceIds, getCachedNews, setCachedNews } from '@/utils/newsCache'
+import { getCachedNews, setCachedNews } from '@/utils/newsCache'
 
 const NewsContext = createContext()
 
@@ -17,21 +17,27 @@ export const NewsProvider = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const [loadingArticle, setLoadingArticle] = useState(false)
   const [displayedCount, setDisplayedCount] = useState(20)
+  const [fontSize, setFontSize] = useState(16)
+  const [allNews, setAllNews] = useState([])
+  const [filtering, setFiltering] = useState(false)
 
-  // ✅ Add font size state
-  const [fontSize, setFontSize] = useState(16) // Default font size
+  const CACHE_KEY = 'allNews'
+  const CACHE_TIMESTAMP_KEY = 'allNewsTimestamp'
+  const CACHE_EXPIRY_MS = 3 * 24 * 60 * 60 * 1000 // 3 days in milliseconds
 
-  const params = useParams()
-  const source = params.slug
+  // const params = useParams()
+  // const source = params.slug
+
+  const searchParams = useSearchParams()
+  const [sourceParam, setSourceParam] = useState(null)
 
   useEffect(() => {
-    const handleOnline = () => {
-      toast.success('✅ You are back online!')
-    }
+    setSourceParam(searchParams.get('source'))
+  }, [searchParams])
 
-    const handleOffline = () => {
-      toast.error('❌ You are offline. Please check your connection.')
-    }
+  useEffect(() => {
+    const handleOnline = () => toast.success('✅ You are back online!')
+    const handleOffline = () => toast.error('❌ You are offline.')
 
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
@@ -41,13 +47,11 @@ export const NewsProvider = ({ children }) => {
       window.removeEventListener('offline', handleOffline)
     }
   }, [])
+
   const generateSlug = name => name.toLowerCase().replace(/\s+/g, '-')
 
-  // Function to detect YouTube links and extract video ID
   const isYouTubeLink = url => {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
-
-    // console.log('YT:', match[1])
 
     return match ? match[1] : null
   }
@@ -56,17 +60,19 @@ export const NewsProvider = ({ children }) => {
     setLoading(true)
 
     try {
-      if (!navigator.onLine) {
-        throw new Error('No internet connection.')
-      }
+      if (!navigator.onLine) throw new Error('No internet connection.')
+      const cached = await getCachedNews(CACHE_KEY)
+      const cachedTimestamp = await getCachedNews(CACHE_TIMESTAMP_KEY)
+      const now = Date.now()
 
-      const cached = await getCachedNews('allNews')
-
-      if (cached) {
+      if (cached && cachedTimestamp && now - cachedTimestamp < CACHE_EXPIRY_MS) {
+        // Cache is still fresh, use it
         const filtered = filterNewsBySource(cached)
-        const assigned = assignPerSourceIds(filtered)
 
-        setNewsData(assigned)
+        setNewsData(filtered)
+
+        // const assigned = assignPerSourceIds(filtered)
+
         setLoading(false)
 
         return
@@ -87,6 +93,7 @@ export const NewsProvider = ({ children }) => {
         const videoId = isYouTubeLink(item.link)
 
         return {
+          uuid: item.uuid, // ✅ Use backend-provided UUID
           title: item.title,
           link: item.link,
           source: item.source || 'Unknown Source',
@@ -99,21 +106,22 @@ export const NewsProvider = ({ children }) => {
         }
       })
 
-      await setCachedNews('allNews', allNews)
+      // Cache fresh news and timestamp
+      await setCachedNews(CACHE_KEY, allNews)
+      await setCachedNews(CACHE_TIMESTAMP_KEY, now)
 
-      const filtered = filterNewsBySource(allNews)
-      const assigned = assignPerSourceIds(filtered)
+      setAllNews(allNews) // ✅ Store everything
+      setNewsData(filterNewsBySource(allNews)) // ✅ Filter view
+      // const filtered = filterNewsBySource(allNews)
 
-      setNewsData(assigned)
+      // setNewsData(filtered)
     } catch (error) {
       console.error('Error fetching news:', error)
 
       if (error.message === 'No internet connection.') {
-        toast.error('❌ No internet connection. Please check your network.')
-      } else if (error.message.includes('HTTP error! status: 404')) {
-        toast.error('❌ News not found (404). Please try again later.')
+        toast.error('❌ No internet connection.')
       } else {
-        toast.error('❌ An unexpected error occurred. Please refresh.')
+        toast.error('❌ An unexpected error occurred.')
       }
 
       setNewsData([])
@@ -123,14 +131,30 @@ export const NewsProvider = ({ children }) => {
   }
 
   const filterNewsBySource = newsList => {
-    if (!source) return newsList
+    if (!sourceParam) return newsList
 
-    return newsList.filter(item => generateSlug(item.source) === source)
+    const slugSource = generateSlug(sourceParam)
+
+    return newsList.filter(item => generateSlug(item.source) === slugSource)
   }
 
+  // Only fetch on first load
   useEffect(() => {
     fetchNews()
-  }, [source])
+  }, []) // ← only run once on initial mount
+
+  useEffect(() => {
+    if (allNews.length > 0) {
+      setFiltering(true)
+
+      setTimeout(() => {
+        const filtered = filterNewsBySource(allNews)
+
+        setNewsData(filtered)
+        setFiltering(false)
+      }, 0)
+    }
+  }, [sourceParam, allNews]) // ✅ now reactive!
 
   const fetchFullContent = async url => {
     setLoadingArticle(true)
@@ -163,26 +187,24 @@ export const NewsProvider = ({ children }) => {
     return imgTags.map(tag => tag.match(/src="([^"]+)"/)[1])
   }
 
-  const handleNewsClick = async id => {
+  const handleNewsClick = async uuid => {
     setLoadingArticle(true)
-    const selectedNews = newsData.find(news => news.id === id)
 
-    console.log('handleNewsClick triggered for ID:', id) // Debugging log
+    const selectedNews = newsData.find(news => news.uuid === uuid)
 
-    // If it's a YouTube video or already has content, just set it as active
     if (!selectedNews || selectedNews.fullContent || selectedNews.videoId) {
-      setActiveId(id)
-      setLoadingArticle(false) // ✅ FIX: Ensure the loader is cleared
+      setActiveId(uuid)
+      setLoadingArticle(false)
 
       return
     }
 
-    setActiveId(id)
+    setActiveId(uuid)
     const { fullContent, mainImage, images } = await fetchFullContent(selectedNews.link)
 
     setNewsData(prevNews =>
       prevNews.map(news =>
-        news.id === id ? { ...news, fullContent, image: mainImage || news.image, additionalImages: images } : news
+        news.uuid === uuid ? { ...news, fullContent, image: mainImage || news.image, additionalImages: images } : news
       )
     )
     setLoadingArticle(false)
@@ -199,7 +221,8 @@ export const NewsProvider = ({ children }) => {
         fontSize,
         setFontSize,
         loadingArticle,
-        handleNewsClick
+        handleNewsClick,
+        filtering
       }}
     >
       {children}
@@ -207,6 +230,4 @@ export const NewsProvider = ({ children }) => {
   )
 }
 
-export const useNews = () => {
-  return useContext(NewsContext)
-}
+export const useNews = () => useContext(NewsContext)

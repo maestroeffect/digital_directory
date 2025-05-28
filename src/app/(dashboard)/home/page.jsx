@@ -21,74 +21,27 @@ import NewsList from '@/components/NewsList'
 import { useNews } from '@/context/NewsContext'
 import PerfectScrollbarWrapper from '@/components/PerfectScrollbar'
 import { useSettings } from '@/@core/hooks/useSettings'
+import { useAnimatedCounter } from '../../../utils/useAnimatedCounter'
 
 const Home = () => {
   const { newsData, onScroll } = useNews()
   const [loading, setLoading] = useState(false)
-  const [totalNewsCount, setTotalNewsCount] = useState(0)
-  const [uniqueSourcesCount, setUniqueSourcesCount] = useState(0)
-  const [uniqueCategoriesCount, setUniqueCategoriesCount] = useState(0)
-  const [totalCommentsCount, setTotalCommentsCount] = useState(0)
+
   const [totalBookmarksCount, setTotalBookmarksCount] = useState(0)
 
   const { settings } = useSettings()
 
   const session = useSession()
 
-  useEffect(() => {
-    // console.log('newsData:', newsData)
+  const totalNews = newsData.length
+  const uniqueSources = new Set(newsData.map(n => n.source)).size
+  const uniqueCategories = new Set(newsData.map(n => n.category)).size
+  const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
 
-    if (newsData.length > 0) {
-      const totalNews = newsData.length
-      const uniqueSources = new Set(newsData.map(n => n.source)).size
-      const uniqueCategories = new Set(newsData.map(n => n.category)).size
-      const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
-
-      let i = 0
-
-      const intervalId = setInterval(() => {
-        if (i <= totalNews) {
-          setTotalNewsCount(i)
-          i++
-        } else {
-          clearInterval(intervalId)
-        }
-      }, 10)
-
-      let j = 0
-
-      const intervalId2 = setInterval(() => {
-        if (j <= uniqueSources) {
-          setUniqueSourcesCount(j)
-          j++
-        } else {
-          clearInterval(intervalId2)
-        }
-      }, 10)
-
-      let k = 0
-
-      const intervalId3 = setInterval(() => {
-        if (k <= uniqueCategories) {
-          setUniqueCategoriesCount(k)
-          k++
-        } else {
-          clearInterval(intervalId3)
-        }
-      }, 10)
-
-      let l = 0
-
-      const intervalId4 = setInterval(() => {
-        if (l <= totalComments) {
-          setTotalCommentsCount(l)
-          l++
-        } else {
-          clearInterval(intervalId4)
-        }
-      }, 10)
-    }
-  }, [newsData])
+  const totalNewsCount = useAnimatedCounter(totalNews)
+  const uniqueSourcesCount = useAnimatedCounter(uniqueSources)
+  const uniqueCategoriesCount = useAnimatedCounter(uniqueCategories)
+  const totalCommentsCount = useAnimatedCounter(totalComments)
 
   useEffect(() => {
     const fetchBookmarks = async () => {
@@ -112,7 +65,7 @@ const Home = () => {
     fetchBookmarks()
   }, [])
 
-  const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
+  // const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
 
   return (
     <PerfectScrollbarWrapper onScroll={onScroll}>

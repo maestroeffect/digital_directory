@@ -24,9 +24,9 @@ import { useSettings } from '@core/hooks/useSettings'
 const NewsReader = () => {
   const { newsData, activeId, setActiveId, loadingArticle, fontSize, handleNewsClick } = useNews()
 
-  console.log(activeId)
+  // console.log(activeId)
 
-  const activeNews = newsData.find(news => news.id === activeId)
+  const activeNews = newsData.find(news => news.uuid === activeId)
 
   // Settings hook
   const { settings } = useSettings()
