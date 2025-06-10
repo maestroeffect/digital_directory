@@ -102,29 +102,28 @@ const Bookmarks = ({ onScroll }) => {
     setImages(prevImages => ({ ...prevImages, ...newImages }))
   }
 
-  const handleDelete = async (bookmarkId, source) => {
+  const handleDelete = async (newsUuid, source) => {
     try {
-      console.log('Deleting bookmark:', { newsId: bookmarkId, source })
+      console.log('Deleting bookmark:', { newsUuid, source })
 
-      const res = await fetch(`/api/auth/bookmarks`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ newsId: bookmarkId, source }) // Send newsId in request body
-      })
+      const res = await fetch(
+        `/api/auth/bookmarks?newsId=${encodeURIComponent(newsUuid)}&newsUuid=${encodeURIComponent(newsUuid)}&source=${encodeURIComponent(source)}`,
+        {
+          method: 'DELETE'
+        }
+      )
 
-      if (!res.ok) throw new Error('Failed to delete zzzz')
+      if (!res.ok) throw new Error('Failed to delete bookmark')
 
       // Update state to remove the deleted bookmark
       setBookmarks(prevBookmarks => {
         const updatedBookmarks = {}
 
-        Object.entries(prevBookmarks).forEach(([source, newsList]) => {
-          const filteredNewsList = newsList.filter(bookmark => bookmark.newsId !== bookmarkId)
+        Object.entries(prevBookmarks).forEach(([src, newsList]) => {
+          const filteredNewsList = newsList.filter(bookmark => bookmark.news.uuid !== newsUuid)
 
           if (filteredNewsList.length > 0) {
-            updatedBookmarks[source] = filteredNewsList
+            updatedBookmarks[src] = filteredNewsList
           }
         })
 
@@ -133,7 +132,7 @@ const Bookmarks = ({ onScroll }) => {
 
       toast.success('Bookmark deleted successfully')
     } catch (error) {
-      console.log('Error deleting bookmark:', error.message)
+      console.error('Error deleting bookmark:', error.message)
       toast.error('Failed to delete bookmark')
     }
   }
@@ -191,20 +190,19 @@ const Bookmarks = ({ onScroll }) => {
             {Object.entries(bookmarks).map(([source, newsList]) =>
               newsList.map(bookmark => (
                 <div
-                  key={bookmark.id}
-                  className={`group relative ${settings.mode === 'dark' ? 'bg-dark border-orange-300' : 'shadow-sm hover:shadow-orange-400/50 hover:shadow-lg'}  border  rounded-lg  p-4 transition-all duration-300  flex flex-col h-full`}
+                  key={bookmark.news.uuid} // use news uuid here
+                  className={`group relative ${settings.mode === 'dark' ? 'bg-dark border-orange-300' : 'shadow-sm hover:shadow-orange-400/50 hover:shadow-lg'} border rounded-lg p-4 transition-all duration-300 flex flex-col h-full`}
                 >
                   <img
-                    src={images[bookmark.id] || bookmark.news.image || 'https://placehold.co/600x400'}
+                    src={images[bookmark.news.uuid] || bookmark.news.image || 'https://placehold.co/600x400'}
                     alt='News'
                     className='w-full h-48 object-cover rounded-lg'
                   />
                   <h3 className={`${settings.mode === 'dark' ? 'text-white' : ''} text-lg font-semibold mb-2 mt-3`}>
                     <a
                       onClick={e => {
-                        // console.log('Just got clicked')
-                        e.preventDefault() // Prevent the default link behavior
-                        handleSourceAndNewsClick(bookmark.newsId, source) // Call the new function to handle news click
+                        e.preventDefault()
+                        handleSourceAndNewsClick(bookmark.news.uuid, source)
                       }}
                       rel='noopener noreferrer'
                       className={`${settings.mode === 'dark' ? 'text-white' : ''} cursor-pointer hover:text-orange-500 transition`}
@@ -212,12 +210,11 @@ const Bookmarks = ({ onScroll }) => {
                       {bookmark.news.title}
                     </a>
                   </h3>
-                  {/* <p className='text-gray-600 mt-2 text-sm'>{bookmark.news.content.slice(0, 100)}...</p> */}
                   <div
                     className={`${settings.mode === 'dark' ? 'bg-dark' : ''} mt-auto flex justify-between items-center pt-4 rounded-b-lg`}
                   >
                     <a
-                      href={sourcesMap[source] || '#'}
+                      href={sourcesMap[source]?.sourceUrl || '#'}
                       rel='noopener noreferrer'
                       className='text-orange-500 font-semibold hover:underline'
                     >
@@ -226,7 +223,7 @@ const Bookmarks = ({ onScroll }) => {
                     <RiDeleteBin6Line
                       size={20}
                       className='text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300'
-                      onClick={() => handleDelete(bookmark.newsId, source)}
+                      onClick={() => handleDelete(bookmark.news.uuid, source)}
                     />
                   </div>
                 </div>
@@ -234,11 +231,6 @@ const Bookmarks = ({ onScroll }) => {
             )}
           </div>
         )}
-        {/* <div className='flex justify-center mt-6'>
-          <button className='px-5 py-2 text-lg bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer'>
-            Load More
-          </button>
-        </div> */}
       </PerfectScrollbarWrapper>
     </div>
   )

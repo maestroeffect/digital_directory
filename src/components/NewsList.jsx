@@ -31,7 +31,7 @@ const NewsList = ({ loading, onScroll }) => {
 
   // Load bookmarked from localStorage
   useEffect(() => {
-    const savedBookmarks = JSON.parse(window.localStorage.getItem('bookmarkedNews')) || []
+    const savedBookmarks = JSON.parse(window.localStorage.getItem('bookmarkedNews'))
 
     setBookmarked(new Set(savedBookmarks))
   }, [])
@@ -113,7 +113,7 @@ const NewsList = ({ loading, onScroll }) => {
       return
     }
 
-    const isBookmarked = bookmarked.has(newsItem.uuid)
+    const isBookmarked = bookmarked.includes(newsItem.uuid)
 
     const confirmAction = await Swal.fire({
       title: isBookmarked ? 'Remove Bookmark?' : 'Bookmark this news?',
@@ -135,31 +135,40 @@ const NewsList = ({ loading, onScroll }) => {
     })
 
     try {
-      // const newsUuid = newsItem.uuid || uuidv4()
-
-      const response = await fetch('/api/auth/bookmarks', {
-        method: isBookmarked ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          newsId: newsItem.id,
-          newsUuid: newsItem.uuid,
-          title: newsItem.title,
-          content: newsItem.contentSnippet || 'No content available.',
-          source: newsItem.source,
-          newsUrl: newsItem.link,
-          sourceUrl,
-          publishedAt: newsItem.publishedDate || new Date().toISOString()
-        })
-      })
+      const response = await fetch(
+        isBookmarked
+          ? `/api/auth/bookmarks?newsId=${newsItem.id}&newsUuid=${newsItem.uuid}&source=${encodeURIComponent(newsItem.source)}`
+          : `/api/auth/bookmarks`,
+        {
+          method: isBookmarked ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          ...(isBookmarked
+            ? {}
+            : {
+                body: JSON.stringify({
+                  newsId: newsItem.id,
+                  newsUuid: newsItem.uuid,
+                  title: newsItem.title,
+                  content: newsItem.contentSnippet || 'No content available.',
+                  source: newsItem.source,
+                  newsUrl: newsItem.link,
+                  sourceUrl,
+                  publishedAt: newsItem.publishedDate || new Date().toISOString()
+                })
+              })
+        }
+      )
 
       if (!response.ok) throw new Error(`Error ${response.status}: ${await response.text()}`)
 
       toast.success(isBookmarked ? 'Bookmark removed successfully' : 'News bookmarked successfully')
     } catch (error) {
-      console.error('❌ Bookmark update error:', error)
+      console.error('❌ Bookmark update error:', error.message)
       toast.error('Something went wrong!')
 
-      // Rollback change
+      // Rollback
       setBookmarked(prev => {
         const rollback = new Set(prev)
 

@@ -32,30 +32,6 @@ const NewsReader = () => {
   const { settings } = useSettings()
   const [retrying, setRetrying] = useState(false)
 
-  // Auto-retry logic when content fails
-  // useEffect(() => {
-  //   if (!loadingArticle && activeId && (!activeNews || (!activeNews.fullContent && !activeNews.videoId))) {
-  //     const toastId = toast.warn('❌ Failed to fetch news. Kindly Reclick or wait, refreshing in 5 secs...', {
-  //       autoClose: 5000
-  //     })
-
-  //     setRetrying(true)
-
-  //     const timer = setTimeout(() => {
-  //       toast.update(toastId, {
-  //         render: '🔄 Retrying now...',
-  //         type: 'info',
-  //         autoClose: 2000
-  //       })
-
-  //       handleNewsClick(activeId) // re-fetch
-  //       setRetrying(false)
-  //     }, 5000)
-
-  //     return () => clearTimeout(timer)
-  //   }
-  // }, [activeNews, activeId, loadingArticle])
-
   if (!activeNews) {
     return (
       <div className='p-8 flex flex-col items-center'>
@@ -109,7 +85,7 @@ const NewsReader = () => {
             ) : (
               <div
                 className={`${settings.mode === 'dark' ? 'text-white' : 'text-gray-700'}`}
-                dangerouslySetInnerHTML={{ __html: activeNews.fullContent || 'Content not available' }}
+                dangerouslySetInnerHTML={{ __html: activeNews.fullContent }}
               />
             )}
           </PerfectScrollbar>

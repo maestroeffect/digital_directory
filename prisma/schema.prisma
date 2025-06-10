@@ -62,7 +62,7 @@ model News {
 
 model Bookmark {
   id        Int       @id @default(autoincrement())
-  uuid      String    @unique @default(uuid())
+  uuid      String
   userId    Int
   newsId    Int
   sourceId  Int

@@ -160,7 +160,7 @@ const Home = () => {
                     .filter(news => news.source === source)
                     .slice(0, 3) // Display up to 3 articles per source
                     .map(news => (
-                      <div key={news.id} className='border-b border-gray-300 py-2'>
+                      <div key={news.uuid} className='border-b border-gray-300 py-2'>
                         <a
                           href={news.link}
                           target='_blank'

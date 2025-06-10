@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 
 import { getServerSession } from 'next-auth'
 
-import { v4 as uuidv4 } from 'uuid' // Import UUID generator
-
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 
@@ -77,7 +75,8 @@ export async function POST(req) {
       data: {
         userId,
         newsId: newsId,
-        sourceId: news.sourceId
+        sourceId: news.sourceId,
+        uuid: newsUuid
       }
     })
 
@@ -89,7 +88,6 @@ export async function POST(req) {
   }
 }
 
-// Handle DELETE request to remove a bookmark
 export async function DELETE(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -98,7 +96,10 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { newsId, source } = await req.json()
+    const { searchParams } = new URL(req.url)
+    const newsId = searchParams.get('newsId')
+    const newsUuid = searchParams.get('newsUuid')
+    const source = searchParams.get('source')
 
     if (!newsId || !source) {
       return NextResponse.json({ error: 'Missing newsId or source' }, { status: 400 })
@@ -110,7 +111,6 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 })
     }
 
-    // Find the source by name
     const sourceRecord = await db.source.findUnique({
       where: { name: source }
     })
@@ -119,13 +119,10 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'Source not found' }, { status: 404 })
     }
 
-    // Find the news by newsId and sourceId (composite unique constraint)
-    const news = await db.news.findUnique({
+    const news = await db.news.findFirst({
       where: {
-        newsId_sourceId: {
-          newsId,
-          sourceId: sourceRecord.id
-        }
+        uuid: newsUuid,
+        sourceId: sourceRecord.id
       }
     })
 
@@ -133,11 +130,10 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'News not found for this source' }, { status: 404 })
     }
 
-    // Delete the bookmark
     await db.bookmark.deleteMany({
       where: {
         userId,
-        newsId,
+        uuid: newsUuid,
         sourceId: sourceRecord.id
       }
     })

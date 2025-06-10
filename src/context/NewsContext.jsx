@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
 
 import Mercury from '@postlight/mercury-parser'
 import { toast } from 'react-toastify'
@@ -27,13 +27,18 @@ export const NewsProvider = ({ children }) => {
 
   // const params = useParams()
   // const source = params.slug
-
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const [sourceParam, setSourceParam] = useState(null)
 
   useEffect(() => {
-    setSourceParam(searchParams.get('source'))
-  }, [searchParams])
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      const source = searchParams.get('source')
+
+      setSourceParam(source)
+    }
+  }, [pathname]) // ✅ pathname changes when the URL updates
 
   useEffect(() => {
     const handleOnline = () => toast.success('✅ You are back online!')
@@ -69,6 +74,7 @@ export const NewsProvider = ({ children }) => {
         // Cache is still fresh, use it
         const filtered = filterNewsBySource(cached)
 
+        setAllNews(cached) // ← ✅ this is missing
         setNewsData(filtered)
 
         // const assigned = assignPerSourceIds(filtered)
@@ -100,6 +106,7 @@ export const NewsProvider = ({ children }) => {
           contentSnippet: item.contentSnippet,
           publishedDate: item.publishedDate,
           image: item.image || '',
+          favicon: item.favicon,
           fullContent: videoId ? '' : '',
           videoId,
           additionalImages: []
@@ -213,6 +220,7 @@ export const NewsProvider = ({ children }) => {
   return (
     <NewsContext.Provider
       value={{
+        allNews,
         newsData,
         setNewsData,
         activeId,
