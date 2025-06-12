@@ -1,8 +1,8 @@
-// app/not-found.jsx
+import { Suspense } from 'react'
 
 import Providers from '@components/Providers'
 import BlankLayout from '@layouts/BlankLayout'
-import NotFound from '@views/NotFound'
+import NotFoundClient from './not-found-client'
 
 import { getServerMode, getSystemMode } from '@core/utils/serverHelpers'
 
@@ -14,7 +14,9 @@ const NotFoundPage = async () => {
   return (
     <Providers direction={direction}>
       <BlankLayout systemMode={systemMode}>
-        <NotFound mode={mode} />
+        <Suspense fallback={<div>Loading 404...</div>}>
+          <NotFoundClient mode={mode} />
+        </Suspense>
       </BlankLayout>
     </Providers>
   )
