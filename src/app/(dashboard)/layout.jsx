@@ -17,21 +17,19 @@ import ScrollToTop from '@core/components/scroll-to-top'
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
-const Layout = async props => {
-  const { children } = props
-
-  // Vars
-  const direction = 'ltr'
+const Layout = async ({ children }) => {
+  // Server-side data fetching
   const mode = await getMode()
   const systemMode = await getSystemMode()
+  const direction = 'ltr'
 
   return (
-    <Providers direction={direction}>
+    <Providers direction={direction} mode={mode} systemMode={systemMode}>
       <LayoutWrapper
         systemMode={systemMode}
         verticalLayout={
           <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />}>
-            {children} {/* Directly render children here */}
+            {children}
           </VerticalLayout>
         }
         horizontalLayout={
