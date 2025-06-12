@@ -1,25 +1,20 @@
-import { Suspense } from 'react'
+// app/not-found.jsx
+'use client'
 
 import Providers from '@components/Providers'
 import BlankLayout from '@layouts/BlankLayout'
-import NotFoundClient from './not-found-client'
+import NotFound from '@views/NotFound'
 
-import { getServerMode, getSystemMode } from '@core/utils/serverHelpers'
-
-const NotFoundPage = async () => {
+export default function NotFoundPage() {
   const direction = 'ltr'
-  const mode = await getServerMode()
-  const systemMode = await getSystemMode()
+  const mode = 'light' // fallback value or derive on client
+  const systemMode = 'light' // fallback value
 
   return (
     <Providers direction={direction}>
       <BlankLayout systemMode={systemMode}>
-        <Suspense fallback={<div>Loading 404...</div>}>
-          <NotFoundClient mode={mode} />
-        </Suspense>
+        <NotFound mode={mode} />
       </BlankLayout>
     </Providers>
   )
 }
-
-export default NotFoundPage
