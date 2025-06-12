@@ -26,7 +26,7 @@ export const NewsProvider = ({ children }) => {
   const CACHE_EXPIRY_MS = 3 * 24 * 60 * 60 * 1000 // 3 days in milliseconds
 
   // const params = useParams()
-  // const source = params.slug
+  // const source = params.slugs
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [sourceParam, setSourceParam] = useState(null)
