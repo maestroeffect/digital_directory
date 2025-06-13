@@ -3,22 +3,17 @@
 
 import { Suspense } from 'react'
 
-import Providers from '@components/Providers'
-import BlankLayout from '@layouts/BlankLayout'
-import NotFound from '@views/NotFound'
+import dynamic from 'next/dynamic'
+
+// Dynamically import the actual view
+const NotFoundContent = dynamic(() => import('./not-found-client.jsx'), {
+  ssr: false
+})
 
 export default function NotFoundPage() {
-  const direction = 'ltr'
-  const mode = 'light' // fallback
-  const systemMode = 'light' // fallback
-
   return (
-    <Providers direction={direction} settingsCookie={{}} mode={mode} systemMode={systemMode}>
-      <BlankLayout systemMode={systemMode}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <NotFound mode={mode} />
-        </Suspense>
-      </BlankLayout>
-    </Providers>
+    <Suspense fallback={<div>Loading...</div>}>
+      <NotFoundContent />
+    </Suspense>
   )
 }
