@@ -22,7 +22,7 @@ export const SettingsProvider = props => {
     navbarContentWidth: themeConfig.navbar.contentWidth,
     contentWidth: themeConfig.contentWidth,
     footerContentWidth: themeConfig.footer.contentWidth,
-    primaryColor: primaryColorConfig[0].main
+    primaryColor: primaryColorConfig?.[0]?.main || '#000000' // fallback to black
   }
 
   const updatedInitialSettings = {
