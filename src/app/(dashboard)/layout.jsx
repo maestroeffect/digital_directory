@@ -15,7 +15,7 @@ import HorizontalFooter from '@components/layout/horizontal/Footer'
 import ScrollToTop from '@core/components/scroll-to-top'
 
 // Util Imports
-import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import { getMode, getSystemMode } from '@/app/utils/serverHelpers'
 
 const Layout = async props => {
   const { children } = props

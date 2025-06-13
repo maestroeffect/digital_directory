@@ -4,7 +4,7 @@ import { SettingsProvider } from '@core/contexts/settingsContext'
 import ThemeProvider from '@components/theme'
 
 // Util Imports
-import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
+import { getMode, getSettingsFromCookie, getSystemMode } from '@/app/utils/serverHelpers.js'
 
 const Providers = async props => {
   // Props
