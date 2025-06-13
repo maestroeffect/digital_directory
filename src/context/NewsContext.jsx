@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 
-import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 import Mercury from '@postlight/mercury-parser'
 import { toast } from 'react-toastify'
@@ -28,7 +28,6 @@ export const NewsProvider = ({ children }) => {
   // const params = useParams()
   // const source = params.slugs
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const [sourceParam, setSourceParam] = useState(null)
 
   useEffect(() => {

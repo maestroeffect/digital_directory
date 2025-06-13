@@ -1,8 +1,6 @@
 // components/NewsReader.js\
 
-import { useEffect, useState } from 'react'
-
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 import { Divider } from '@mui/material'
 
