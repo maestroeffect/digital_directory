@@ -113,7 +113,7 @@ const NewsList = ({ loading, onScroll }) => {
       return
     }
 
-    const isBookmarked = bookmarked.includes(newsItem.uuid)
+    const isBookmarked = bookmarked.has(newsItem.uuid)
 
     const confirmAction = await Swal.fire({
       title: isBookmarked ? 'Remove Bookmark?' : 'Bookmark this news?',
