@@ -12,9 +12,9 @@ import { NewsProvider } from '@/context/NewsContext'
 import Provider from '@/components/Provider'
 import Providers from './Providers'
 
-const ClientLayout = ({ children }) => {
+const ClientLayout = ({ children, settingsCookie, mode, systemMode, direction }) => {
   return (
-    <Providers>
+    <Providers settingsCookie={settingsCookie} mode={mode} systemMode={systemMode} direction={direction}>
       <InitColorSchemeScript attribute='data' defaultMode='light' />
       <SessionProvider>
         <MobileBlocker>
