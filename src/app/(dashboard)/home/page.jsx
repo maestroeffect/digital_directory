@@ -66,6 +66,7 @@ const Home = () => {
   }, [])
 
   // const totalComments = newsData.reduce((sum, n) => sum + (n.comments || 0), 0)
+  if (!settings) return <div className='p-4 text-center'>Loading...</div>
 
   return (
     <PerfectScrollbarWrapper onScroll={onScroll}>
