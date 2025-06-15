@@ -10,10 +10,11 @@ import { ToastContainer } from 'react-toastify'
 import MobileBlocker from '@/components/MobileBlocker'
 import { NewsProvider } from '@/context/NewsContext'
 import Provider from '@/components/Provider'
+import Providers from './Providers'
 
 const ClientLayout = ({ children }) => {
   return (
-    <Provider>
+    <Providers>
       <InitColorSchemeScript attribute='data' defaultMode='light' />
       <SessionProvider>
         <MobileBlocker>
@@ -23,7 +24,7 @@ const ClientLayout = ({ children }) => {
           </NewsProvider>
         </MobileBlocker>
       </SessionProvider>
-    </Provider>
+    </Providers>
   )
 }
 
