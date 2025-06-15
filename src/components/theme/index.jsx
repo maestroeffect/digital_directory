@@ -40,16 +40,25 @@ const CustomThemeProvider = props => {
   if (isServer) {
     currentMode = systemMode
   } else {
-    if (settings.mode === 'system') {
+    if (settings?.mode === 'system') {
       currentMode = isDark ? 'dark' : 'light'
     } else {
-      currentMode = settings.mode
+      currentMode = settings?.mode ?? 'light'
     }
+  }
+
+  // Safe defaults for settings
+  const safeSettings = {
+    skin: settings?.skin ?? 'default',
+    primaryColor: settings?.primaryColor ?? '#1976d2',
+    mode: settings?.mode ?? 'light'
+
+    // add other settings keys as needed
   }
 
   // Merge the primary color scheme override with the core theme
   const theme = useMemo(() => {
-    const primaryColor = settings?.primaryColor ?? '#1976d2'
+    const { primaryColor } = safeSettings
 
     const newTheme = {
       colorSchemes: {
@@ -77,10 +86,10 @@ const CustomThemeProvider = props => {
       }
     }
 
-    const coreTheme = deepmerge(defaultCoreTheme(settings, currentMode, direction), newTheme)
+    const coreTheme = deepmerge(defaultCoreTheme(safeSettings, currentMode, direction), newTheme)
 
     return createTheme(coreTheme)
-  }, [settings?.primaryColor, settings?.skin, currentMode])
+  }, [safeSettings.primaryColor, safeSettings.skin, currentMode, direction])
 
   return (
     <AppRouterCacheProvider
