@@ -35,17 +35,9 @@ const CustomThemeProvider = props => {
 
   // Vars
   const isServer = typeof window === 'undefined'
-  let currentMode
+  const modeSetting = settings?.mode ?? systemMode ?? 'light'
 
-  if (isServer) {
-    currentMode = systemMode
-  } else {
-    if (settings?.mode === 'system') {
-      currentMode = isDark ? 'dark' : 'light'
-    } else {
-      currentMode = settings?.mode ?? 'light'
-    }
-  }
+  const currentMode = isServer ? modeSetting : modeSetting === 'system' ? (isDark ? 'dark' : 'light') : modeSetting
 
   // Safe defaults for settings
   const safeSettings = {
@@ -53,7 +45,7 @@ const CustomThemeProvider = props => {
     primaryColor: settings?.primaryColor ?? '#1976d2',
     mode: settings?.mode ?? 'light'
 
-    // add other settings keys as needed
+    // add other keys here if needed
   }
 
   // Merge the primary color scheme override with the core theme
