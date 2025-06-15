@@ -49,23 +49,25 @@ const CustomThemeProvider = props => {
 
   // Merge the primary color scheme override with the core theme
   const theme = useMemo(() => {
+    const primaryColor = settings?.primaryColor ?? '#1976d2'
+
     const newTheme = {
       colorSchemes: {
         light: {
           palette: {
             primary: {
-              main: settings.primaryColor,
-              light: lighten(settings.primaryColor, 0.2),
-              dark: darken(settings.primaryColor, 0.1)
+              main: primaryColor,
+              light: lighten(primaryColor, 0.2),
+              dark: darken(primaryColor, 0.1)
             }
           }
         },
         dark: {
           palette: {
             primary: {
-              main: settings.primaryColor,
-              light: lighten(settings.primaryColor, 0.2),
-              dark: darken(settings.primaryColor, 0.1)
+              main: primaryColor,
+              light: lighten(primaryColor, 0.2),
+              dark: darken(primaryColor, 0.1)
             }
           }
         }
@@ -78,8 +80,7 @@ const CustomThemeProvider = props => {
     const coreTheme = deepmerge(defaultCoreTheme(settings, currentMode, direction), newTheme)
 
     return createTheme(coreTheme)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.primaryColor, settings.skin, currentMode])
+  }, [settings?.primaryColor, settings?.skin, currentMode])
 
   return (
     <AppRouterCacheProvider
