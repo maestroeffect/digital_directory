@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 
 // MUI Imports
 import { deepmerge } from '@mui/utils'
@@ -25,30 +25,35 @@ import { useSettings } from '@core/hooks/useSettings'
 // Core Theme Imports
 import defaultCoreTheme from '@core/theme'
 
-const CustomThemeProvider = props => {
-  // Props
-  const { children, direction, systemMode } = props
+const CustomThemeProvider = ({ children, direction, systemMode }) => {
+  // Ensure the component is mounted before using media queries or window-related values
+  const [isClient, setIsClient] = useState(false)
 
-  // Hooks
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Hooks (always called unconditionally)
   const { settings } = useSettings()
   const isDark = useMedia('(prefers-color-scheme: dark)', systemMode === 'dark')
 
-  // Vars
-  const isServer = typeof window === 'undefined'
-  const modeSetting = settings?.mode ?? systemMode ?? 'light'
-
-  const currentMode = isServer ? modeSetting : modeSetting === 'system' ? (isDark ? 'dark' : 'light') : modeSetting
-
-  // Safe defaults for settings
+  // Fallback safe settings
   const safeSettings = {
     skin: settings?.skin ?? 'default',
     primaryColor: settings?.primaryColor ?? '#1976d2',
     mode: settings?.mode ?? 'light'
-
-    // add other keys here if needed
   }
 
-  // Merge the primary color scheme override with the core theme
+  // Determine current mode
+  const currentMode = useMemo(() => {
+    if (safeSettings.mode === 'system') {
+      return isDark ? 'dark' : 'light'
+    }
+
+    return safeSettings.mode
+  }, [safeSettings.mode, isDark])
+
+  // Create theme object
   const theme = useMemo(() => {
     const { primaryColor } = safeSettings
 
@@ -83,6 +88,9 @@ const CustomThemeProvider = props => {
     return createTheme(coreTheme)
   }, [safeSettings.primaryColor, safeSettings.skin, currentMode, direction])
 
+  // Still wait for client mount before rendering (but all hooks run unconditionally)
+  if (!isClient) return null
+
   return (
     <AppRouterCacheProvider
       options={{
@@ -98,11 +106,9 @@ const CustomThemeProvider = props => {
         defaultMode={systemMode}
         modeStorageKey={`${themeConfig.templateName.toLowerCase().split(' ').join('-')}-mui-template-mode`}
       >
-        <>
-          <ModeChanger systemMode={systemMode} />
-          <CssBaseline />
-          {children}
-        </>
+        <ModeChanger systemMode={systemMode} />
+        <CssBaseline />
+        {children}
       </ThemeProvider>
     </AppRouterCacheProvider>
   )
