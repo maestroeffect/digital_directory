@@ -56,7 +56,7 @@ const DebouncedColorPicker = props => {
   const { settings, isColorFromPrimaryConfig, handleChange } = props
 
   // States
-  const [debouncedColor, setDebouncedColor] = useState(settings.primaryColor ?? primaryColorConfig[0].main)
+  const [debouncedColor, setDebouncedColor] = useState(() => settings?.primaryColor ?? primaryColorConfig[0].main)
 
   // Hooks
   useDebounce(() => handleChange('primaryColor', debouncedColor), 200, [debouncedColor])
@@ -64,12 +64,12 @@ const DebouncedColorPicker = props => {
   return (
     <>
       <HexColorPicker
-        color={!isColorFromPrimaryConfig ? (settings.primaryColor ?? primaryColorConfig[0].main) : '#eee'}
+        color={!isColorFromPrimaryConfig ? (settings?.primaryColor ?? primaryColorConfig[0].main) : '#eee'}
         onChange={setDebouncedColor}
       />
       <HexColorInput
         className={styles.colorInput}
-        color={!isColorFromPrimaryConfig ? (settings.primaryColor ?? primaryColorConfig[0].main) : '#eee'}
+        color={!isColorFromPrimaryConfig ? (settings?.primaryColor ?? primaryColorConfig[0].main) : '#eee'}
         onChange={setDebouncedColor}
         prefixed
         placeholder='Type a color'
@@ -324,7 +324,7 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
                   </label>
                   <Switch
                     id='customizer-semi-dark'
-                    checked={settings.semiDark === true}
+                    checked={settings?.semiDark === true}
                     onChange={() => handleChange('semiDark', !settings.semiDark)}
                   />
                 </div>
