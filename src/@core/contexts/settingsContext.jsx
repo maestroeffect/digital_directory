@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useMemo, useState } from 'react'
+import { createContext, useMemo, useState, useEffect } from 'react'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
@@ -8,92 +8,95 @@ import primaryColorConfig from '@configs/primaryColorConfig'
 // Hook Imports
 import { useObjectCookie } from '@core/hooks/useObjectCookie'
 
-// Initial Settings Context
-export const SettingsContext = createContext(null)
+// Create context with default values
+export const SettingsContext = createContext({
+  settings: {
+    mode: 'light',
+    skin: 'default',
+    semiDark: false,
+    layout: 'vertical',
+    navbarContentWidth: 'compact',
+    contentWidth: 'compact',
+    footerContentWidth: 'compact',
+    primaryColor: primaryColorConfig?.[0]?.main || '#000000'
+  },
+  updateSettings: () => console.warn('No SettingsProvider found'),
+  isSettingsChanged: false,
+  resetSettings: () => console.warn('No SettingsProvider found'),
+  updatePageSettings: () => console.warn('No SettingsProvider found')
+})
 
 // Settings Provider
-export const SettingsProvider = props => {
-  // Initial Settings
-  const initialSettings = {
-    mode: props.mode || themeConfig.mode || 'light',
-    skin: themeConfig.skin,
-    semiDark: themeConfig.semiDark,
-    layout: themeConfig.layout,
-    navbarContentWidth: themeConfig.navbar.contentWidth,
-    contentWidth: themeConfig.contentWidth,
-    footerContentWidth: themeConfig.footer.contentWidth,
-    primaryColor: primaryColorConfig?.[0]?.main || '#000000' // fallback to black
-  }
-
-  const updatedInitialSettings = {
-    ...initialSettings,
-    mode: props.mode || themeConfig.mode
-  }
-
-  // Cookies
+export const SettingsProvider = ({ children, ...props }) => {
+  // Initialize cookie hook at the top level
   const [settingsCookie, updateSettingsCookie] = useObjectCookie(
-    themeConfig.settingsCookieName,
-    JSON.stringify(props.settingsCookie) !== '{}' ? props.settingsCookie : updatedInitialSettings
+    themeConfig?.settingsCookieName || 'settings',
+    JSON.stringify(props.settingsCookie) !== '{}' ? props.settingsCookie : null
   )
 
-  // State
-  const [_settingsState, _updateSettingsState] = useState(
-    JSON.stringify(settingsCookie) !== '{}' ? settingsCookie : updatedInitialSettings
-  )
+  // Safely get default values with fallbacks
+  const getDefaultSettings = () => ({
+    mode: props.mode || themeConfig?.mode || 'light',
+    skin: props.skin || themeConfig?.skin || 'default',
+    semiDark: props.semiDark ?? themeConfig?.semiDark ?? false,
+    layout: props.layout || themeConfig?.layout || 'vertical',
+    navbarContentWidth: props.navbarContentWidth || themeConfig?.navbar?.contentWidth || 'compact',
+    contentWidth: props.contentWidth || themeConfig?.contentWidth || 'compact',
+    footerContentWidth: props.footerContentWidth || themeConfig?.footer?.contentWidth || 'compact',
+    primaryColor: props.primaryColor || primaryColorConfig?.[0]?.main || '#000000'
+  })
 
-  const updateSettings = (settings, options) => {
-    const { updateCookie = true } = options || {}
+  // Initialize state with defaults
+  const [settingsState, setSettingsState] = useState(getDefaultSettings())
+  const [isInitialized, setIsInitialized] = useState(false)
 
-    _updateSettingsState(prev => {
+  // Initialize with cookie values once mounted
+  useEffect(() => {
+    if (settingsCookie) {
+      setSettingsState(settingsCookie)
+    }
+
+    setIsInitialized(true)
+  }, [settingsCookie])
+
+  const updateSettings = (settings, options = { updateCookie: true }) => {
+    setSettingsState(prev => {
       const newSettings = { ...prev, ...settings }
 
-      // Update cookie if needed
-      if (updateCookie) updateSettingsCookie(newSettings)
+      if (options.updateCookie) {
+        updateSettingsCookie(newSettings)
+      }
 
       return newSettings
     })
   }
 
-  /**
-   * Updates the settings for page with the provided settings object.
-   * Updated settings won't be saved to cookie hence will be reverted once navigating away from the page.
-   *
-   * @param settings - The partial settings object containing the properties to update.
-   * @returns A function to reset the page settings.
-   *
-   * @example
-   * useEffect(() => {
-   *     return updatePageSettings({ theme: 'dark' });
-   * }, []);
-   */
-  const updatePageSettings = settings => {
-    updateSettings(settings, { updateCookie: false })
-
-    // Returns a function to reset the page settings
-    return () => updateSettings(settingsCookie, { updateCookie: false })
-  }
-
-  const resetSettings = () => {
-    updateSettings(initialSettings)
-  }
-
+  // Calculate isSettingsChanged using useMemo at the top level
   const isSettingsChanged = useMemo(
-    () => JSON.stringify(initialSettings) !== JSON.stringify(_settingsState),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [_settingsState]
+    () => JSON.stringify(getDefaultSettings()) !== JSON.stringify(settingsState),
+    [settingsState]
   )
+
+  // Only render children after initialization
+  if (!isInitialized) {
+    return null // or a loading spinner
+  }
 
   return (
     <SettingsContext.Provider
       value={{
-        settings: _settingsState,
+        settings: settingsState,
         updateSettings,
         isSettingsChanged,
-        resetSettings,
-        updatePageSettings
+        resetSettings: () => updateSettings(getDefaultSettings()),
+        updatePageSettings: settings => {
+          updateSettings(settings, { updateCookie: false })
+
+          return () => updateSettings(settingsState, { updateCookie: false })
+        }
       }}
     >
-      {props.children}
+      {children}
     </SettingsContext.Provider>
   )
 }
