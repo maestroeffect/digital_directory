@@ -15,7 +15,7 @@ export const SettingsContext = createContext(null)
 export const SettingsProvider = props => {
   // Initial Settings
   const initialSettings = {
-    mode: themeConfig.mode,
+    mode: props.mode || themeConfig.mode || 'light',
     skin: themeConfig.skin,
     semiDark: themeConfig.semiDark,
     layout: themeConfig.layout,
