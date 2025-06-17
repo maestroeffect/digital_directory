@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+
 import { getServerSession } from 'next-auth'
+
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 
@@ -13,6 +15,7 @@ export async function GET(req) {
 
     const sources = sourcesFromDb.map(source => {
       const updatedUrl = source.sourceUrl.replace('http://localhost:3000', BASE_URL)
+
       return {
         ...source,
         sourceUrl: updatedUrl
@@ -22,6 +25,7 @@ export async function GET(req) {
     return NextResponse.json({ sources }, { status: 200 })
   } catch (error) {
     console.error('❌ Fetch Sources API Error:', error.message)
+
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
